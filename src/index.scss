@@ -1,0 +1,87 @@
+body,
+div,
+p,
+span,
+ul,
+li,
+img,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+}
+
+a {
+    color: #fff;
+}
+
+.t-c {
+    text-align: center;
+}
+
+.f_c_999 {
+    color: #999;
+}
+
+.f_c_333 {
+    color: #333;
+}
+
+.dev-waiting {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    font-size: 0.4rem;
+    transform: translate(-50%, -50%);
+    color: #999;
+}
+
+.d-p-f {
+    display: flex;
+}
+
+.flex-sub-1 {
+    flex: 1;
+}
+
+li {
+    list-style: none;
+}
+
+
+/*组件搜索 reset*/
+
+.am-search {
+    background-color: #1296db !important;
+}
+
+
+/*组件搜索输入框 reset*/
+
+.am-search-input {
+    background-color: #aed9f5 !important;
+}
+
+
+/*组件搜索框取消字体color reset*/
+
+.am-search-cancel {
+    color: #fff !important;
+}
+
+.am-list-line {
+    padding-right: 0 !important;
+}
+
+.am-list-item {
+    padding-right: 15px !important;
+}
+
+.am-list-content {
+  font-size: 16px !important;
+}

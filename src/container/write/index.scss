@@ -1,0 +1,22 @@
+.write-page {
+    .submit-btn {
+        margin-bottom: 20px;
+    }
+    width: 100%;
+    .write-content {
+        display: inline-block;
+        width: 48%;
+        margin-right: 4%;
+    }
+    .article-show {
+        display: inline-block;
+        width: 48%;
+        border: 1px solid #ccc;
+        height: 510px;
+        max-height: 510px;
+        overflow-y: scroll;
+    }
+    .clear-btn {
+        margin-right: 30px;
+    }
+}

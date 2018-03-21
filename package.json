@@ -1,16 +1,38 @@
 {
-  "name": "blog-manage",
+  "name": "blog",
   "version": "0.1.0",
   "private": true,
+  "description": "this is a personal blog manage",
   "dependencies": {
+    "antd": "^3.2.3",
+    "body-parser": "^1.18.2",
+    "express": "^4.16.2",
+    "marked": "^0.3.17",
+    "node-sass": "^4.7.2",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
-    "react-scripts": "1.1.1"
+    "react-router-dom": "^4.2.2",
+    "react-scripts": "1.0.17",
+    "sass-loader": "^6.0.7",
+    "whatwg-fetch": "^2.0.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jermken/blog-manage.git"
+  },
+  "author": "jermken",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jermken/blog-manage/issues"
   },
   "scripts": {
     "start": "react-scripts start",
+    "server": "node server.js",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
+  },
+  "devDependencies": {
+    "moment": "^2.21.0"
   }
 }

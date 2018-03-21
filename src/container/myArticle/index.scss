@@ -1,0 +1,21 @@
+table thead th {
+    background: #e6f7ff !important;
+    font-weight: bold !important;
+}
+.pagination-wrap {
+    display: flex;
+    margin-top: 30px;
+}
+.search-btn {
+    margin-left: 50px;
+}
+.gap-line {
+    width: 2px;
+    display: inline-block;
+    height: 12px;
+    margin: 0 10px;
+    background: #ccc;
+}
+.page-from {
+    padding: 10px!important;
+}
