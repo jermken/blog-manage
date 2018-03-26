@@ -9,5 +9,8 @@ module.exports = {
     },
     update: function(data) {
         return User.update({_id: data._id}, {$set: {data}}).exec()
+    },
+    query: function(data) {
+        return User.findOne(data).exec();
     }
 }

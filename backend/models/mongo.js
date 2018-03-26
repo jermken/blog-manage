@@ -15,7 +15,8 @@ const ArticleSchema = new Schema('Aritcle', {
     author: {type: 'string'},
     label: {type: 'string'},
     title: {type: 'string'},
-    date: {type: 'string'}
+    date: {type: 'string'},
+    content: {type: 'string'}
 })
 //----- Schema -----//
 

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Table, Form, Input, Pagination, Row, Col, Button, Select, DatePicker } from 'antd';
 import moment from 'moment';
+import request from '../../server/server';
 import './index.scss';
 
 const Option = Select.Option;
@@ -22,6 +23,7 @@ export default class MyArticle extends Component {
     componentWillMount() {
         const columns = this.initColumns();
         const paginationConfig = this.initPagination();
+        this.fetchData(1,10);
         this.setState({
             columns: columns,
             paginationConfig: paginationConfig
@@ -48,6 +50,9 @@ export default class MyArticle extends Component {
         const paginationConfig = that.state.paginationConfig;
         paginationConfig.current = queryParams.page = page;
         paginationConfig.pageSize = queryParams.pageSize = pageSize;
+        request.reqGET('articlelist', {}, (res) => {
+            console.log(res)
+        });
         that.setState({
             queryParams: queryParams,
             paginationConfig: paginationConfig

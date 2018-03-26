@@ -1,6 +1,6 @@
 import 'whatwg-fetch';
-
-const publicPath = 'http://127.0.0.1:3030/api/'; // https://nile.dev.xone.xin/api/
+import apiConfig from './apiConfig';
+const publicPath = 'http://127.0.0.1:3000'; // https://nile.dev.xone.xin/api/
 
 
 /* 判断响应的状态 */
@@ -42,7 +42,7 @@ const xmlHttpReq = {
     reqPOST: (url, data, cb) => {
         let time = new Date();
         time = time.getTime();
-        url = publicPath + url + '?_time_=' + time;
+        url = apiConfig[url] + '?_time_=' + time;
         fetch(url,{
             method: 'POST',
             body: JSON.stringify(data),
@@ -63,7 +63,7 @@ const xmlHttpReq = {
     reqGET: (url, data, cb) => {
         let time = new Date();
         time = time.getTime();
-        let URL = publicPath + url + '?_time_=' + time + '&' + objectToStr(data);
+        let URL = apiConfig[url] + '?_time_=' + time + '&' + objectToStr(data);
         fetch(URL,{
             credentials: 'include'
         })

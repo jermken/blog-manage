@@ -10,9 +10,14 @@ const util = {
         app.get(url, (req, res) => {
             res.header("Access-Control-Allow-Origin", "http://localhost:3000");
             res.header("Access-Control-Allow-Credentials", true);
-            let resData = wokerFn(req, res);
-            res.send(resData);
-            res.end();
+            wokerFn(req, res).then((resData) => {
+                resData = Object.prototype.toString.call(resData) === '[object Array]'? resData : [resData];
+                res.send({
+                    code: 0,
+                    data: resData
+                });
+                res.end();
+            });
         });
     },
     /**
