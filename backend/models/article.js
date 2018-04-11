@@ -9,5 +9,9 @@ module.exports = {
     },
     update: function(data) {
         return Article.update({_id: data._id}, {$set: data}).exec()
+    },
+    query: function(data) {
+        let params = data._id ? {_id: data._id} : {};
+        return Article.find(params).exec();
     }
 }

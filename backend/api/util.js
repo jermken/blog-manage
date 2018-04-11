@@ -32,9 +32,13 @@ const util = {
             res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
             res.header("Access-Control-Allow-Methods", "GET, POST, PUT");
             res.header("Access-Control-Allow-Credentials", true);
-            let resData = wokerFn(req, res);
-            res.send(resData);
-            res.end();
+            wokerFn(req, res).then(()=> {
+                res.send({
+                    code: 0,
+                    msg: '新增成功'
+                });
+                res.end();
+            });
         });
     }
 };

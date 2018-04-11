@@ -1,17 +1,12 @@
 
 const { getHandler, postHandler } = require('./util');
-const { User } = require('../models/index');
+const { User, Article } = require('../models/index');
 const apiRouters = (app) => {
     getHandler(app, '/api/article_list.json',(req, res) => {
-        return User.query({
-            name: 'jermken'
-        })
+        return Article.query(req.query)
     });
     postHandler(app, '/api/update_article.json', (req, res) => {
-        return {
-            code:0,
-            data: req.body
-        }
+        return Article.create(req.body);
     });
 };
 
