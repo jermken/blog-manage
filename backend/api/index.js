@@ -1,14 +1,21 @@
 
-const { getHandler, postHandler } = require('./util');
+const { loginHandler, getHandler, postHandler } = require('./util');
 const { User, Article } = require('../models/index');
 const apiRouters = (app) => {
-    postHandler(app, '/api/login.json', (req, res) => {
+    loginHandler(app, '/api/login.json', (req, res) => {
         return User.query(req.body).then((result)=>{
-            res.send({
-                code: 0,
-                msg: '登录成功！',
-                req: result
-            });
+            if(result.name == req.body.name && result.password == req.body.password) {
+                req.session.name = result.name;
+                res.send({
+                    code: 0,
+                    msg: '登录成功！'
+                });
+            } else {
+                res.send({
+                    code: 100,
+                    msg: '用户名或密码不匹配！'
+                });
+            }
             res.end();
         });
     });

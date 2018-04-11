@@ -1,5 +1,6 @@
 module.exports = {
     checkLogin: (req, res, next) => {
+        console.log(req.session.user);
         if(!req.session.user) {
             res.send({
                 code: 200,
@@ -7,6 +8,6 @@ module.exports = {
             });
             res.end();
         }
-        //next()
+        next()
     }
 }

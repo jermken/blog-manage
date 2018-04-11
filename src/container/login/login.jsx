@@ -18,9 +18,9 @@ export default class Login extends Component {
   componentDidMount() {}
 
   loginSubmit() {
-    debugger;
     let that = this;
-    if (!that.state.userName || !that.state.password) {
+    let { userName, password} = that.state;
+    if (!userName || !password) {
         return Modal.error({
             title: "请将信息填写完整！",
             okText: "确定"
@@ -29,7 +29,7 @@ export default class Login extends Component {
     that.setState({
       isLoading: true
     });
-    request.reqPOST("login", {}, res => {
+    request.reqPOST("login", {name:userName, password:password}, res => {
       if (!res.code) {
         Modal.success({
           title: "登陆成功",

@@ -11,6 +11,6 @@ module.exports = {
         return User.update({_id: data._id}, {$set: {data}}).exec()
     },
     query: function(data) {
-        return User.findOne(data).exec();
+        return User.findOne({name: data.name}).exec();
     }
 }
