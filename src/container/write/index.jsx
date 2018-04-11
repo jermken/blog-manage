@@ -43,9 +43,9 @@ export default class Write extends Component {
   onSubmit() {
     const title = this.refs.title.input.value,
       label = this.refs.label.input.value,
-      type = this.refs.label.input.type,
+      type = this.refs.type.input.value,
       author = this.refs.author.input.value,
-      content = this.state.content;
+      content = this.state.data.content;
     if (!title || !label || !type || !author || !content) {
       return Modal.error({
         title: "请将信息填写完整！",
