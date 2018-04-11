@@ -23,7 +23,7 @@ export default class MyArticle extends Component {
     componentWillMount() {
         const columns = this.initColumns();
         const paginationConfig = this.initPagination();
-        this.fetchData(1,10);
+        //this.fetchData(1,10);
         this.setState({
             columns: columns,
             paginationConfig: paginationConfig

@@ -54,10 +54,12 @@ const xmlHttpReq = {
         .then(checkStatus)
         .then(parseJSON)
         .then((data)=>{
+            if(data.code == 200) return window.location.href = '/login';
             typeof cb === 'function' ? cb(data) : void 0
         })
         .catch((error) => {
             console.log('request failed', error);
+            throw new Error(error);
         })
     },
     reqGET: (url, data, cb) => {
@@ -70,10 +72,12 @@ const xmlHttpReq = {
         .then(checkStatus)
         .then(parseJSON)
         .then((data)=> {
+            if(data.code == 200) return window.location.href = '/login';
             typeof cb === 'function' ? cb(data) : void 0
         })
         .catch((error) => {
             console.log('request failed', error);
+            throw new Error(error);
         });
     }
 };
