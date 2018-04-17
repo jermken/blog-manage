@@ -5,7 +5,7 @@ const apiRouters = (app) => {
     loginHandler(app, '/api/login.json', (req, res) => {
         return User.query(req.body).then((result)=>{
             if(result.name == req.body.name && result.password == req.body.password) {
-                req.session.name = result.name;
+                req.session.user = result;
                 res.send({
                     code: 0,
                     msg: '登录成功！'

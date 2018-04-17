@@ -17,8 +17,8 @@ app.use(session({
     cookie: {
         maxAge: sessionConfig.maxAge
     },
-    saveUninitialized: false,
-    resave: true,
+    saveUninitialized: true,
+    resave: false,
     store: new MongoStore({
         url: mongodbConfig.mongoUrl
     })
