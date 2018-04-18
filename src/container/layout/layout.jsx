@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Route, Redirect } from 'react-router-dom';
 import './layout.scss';
-import { Home, Login } from './../index.js';
+import { Home, Login, LoginUp } from './../index.js';
 
 class App extends Component {
 
@@ -15,6 +15,7 @@ class App extends Component {
                 <Route exact path="/" render={() => <Redirect to="/home" />} />
                 <Route path="/home" component={Home}></Route>
                 <Route path="/login" component={Login}></Route>
+                <Route path="/loginup" component={LoginUp}></Route>
             </div>
         </div>
     }

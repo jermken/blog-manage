@@ -124,7 +124,12 @@ export default class MyArticle extends Component {
   }
 
   deleteArticle(item) {
+    let that = this;
     console.log(item);
+    request.reqPOST("deleteArticle", {...item}, res => {
+      console.log(res);
+      that.fetchData();
+    });
   }
 
   render() {

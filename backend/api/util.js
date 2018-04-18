@@ -11,10 +11,23 @@ const util = {
             res.header("Access-Control-Allow-Origin", "http://localhost:3000");
             res.header("Access-Control-Allow-Credentials", true);
             wokerFn(req, res).then((resData) => {
+                if(!resData) {
+                    res.send({
+                        code: 0,
+                        data: []
+                    });
+                    return res.end();
+                }
                 resData = Object.prototype.toString.call(resData) === '[object Array]'? resData : [resData];
                 res.send({
                     code: 0,
                     data: resData
+                });
+                res.end();
+            }).catch(()=>{
+                res.send({
+                    code: 100,
+                    msg: '服务器异常！'
                 });
                 res.end();
             });
@@ -41,7 +54,7 @@ const util = {
      * @param {?function} wokerFn 
      *
      */
-    loginHandler: (app, url, wokerFn) => {
+    noCheckHandler: (app, url, wokerFn) => {
         app.use(url, (req, res) => {
             res.header("Access-Control-Allow-Origin", "http://localhost:3000");
             res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");

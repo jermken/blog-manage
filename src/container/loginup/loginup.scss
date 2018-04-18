@@ -7,9 +7,9 @@ $bash-font-size: 14px;
     background-size: 100% 100%;
     position: relative;
 }
-.form-wrap {
+.loginup-form-wrap {
     width: 300px;
-    height:300px;
+    height:340px;
     position: absolute;
     left: 50%;
     top: 50%;
@@ -25,8 +25,16 @@ $bash-font-size: 14px;
         font-size: $bash-font-size;
         font-weight: bold;
     }
-    .login-form-btn {
-        width: 100%;
+    .recommend-num {
+        display: inline-block;
+        width: 140px;
+    }
+    .input-bottom {
+        margin-bottom: 5px;
+    }
+    .loginup-form-btn {
+        width: 65px;
+        margin-left: 35px;
     }
     .aLink {
         color: #1890ff;

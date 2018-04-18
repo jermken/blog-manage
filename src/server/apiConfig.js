@@ -4,7 +4,8 @@ const apiConfig = {
     updateArticle: '/api/update_article.json', // 更新文章
     addArticle: '/api/add_article.json', // 新增文章
     login: '/api/login.json', // 登陆
-    loginout: '/api/loginout.json', // 登出   
+    loginout: '/api/loginout.json', // 登出 
+    loginup: '/api/loginup.json', // 注册  
 }
 
 export default apiConfig;

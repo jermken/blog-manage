@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Form, Icon, Input, Button, Modal } from "antd";
 import request from "../../server/server.js";
 import "./login.scss";
-
+import md5 from 'js-md5';
 const FormItem = Form.Item;
 export default class Login extends Component {
   constructor(props) {
@@ -29,7 +29,7 @@ export default class Login extends Component {
     that.setState({
       isLoading: true
     });
-    request.reqPOST("login", {name:userName, password:password}, res => {
+    request.reqPOST("login", {name:userName, password:md5(password)}, res => {
       if (!res.code) {
         Modal.success({
           title: "登陆成功",
@@ -61,6 +61,10 @@ export default class Login extends Component {
       });
     }
   }
+
+  gotoLoginUp() {
+    window.location.href = '/loginup';
+}
 
   render() {
     const that = this;
@@ -109,6 +113,7 @@ export default class Login extends Component {
                 登陆
               </Button>
             </FormItem>
+            <a className="aLink" onClick={that.gotoLoginUp}>还没账号？去注册</a>
           </Form>
         </div>
       </div>

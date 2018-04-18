@@ -8,7 +8,7 @@ mongolass.connect(mongodbConfig.mongoUrl)
 //+++++ Schema +++++//
 const UserSchema = new Schema('User', {
     name: {type: 'string'},
-    password: { type: 'number'}
+    password: { type: 'string'}
 })
 
 const ArticleSchema = new Schema('Aritcle', {
