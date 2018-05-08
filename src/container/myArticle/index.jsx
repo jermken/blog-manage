@@ -15,6 +15,7 @@ import request from "../../server/server";
 import "./index.scss";
 
 const Option = Select.Option;
+const { RangePicker } = DatePicker;
 let that;
 export default class MyArticle extends Component {
   constructor(props) {
@@ -23,7 +24,13 @@ export default class MyArticle extends Component {
       columns: [],
       dataList: [],
       paginationConfig: {},
-      queryParams: {}
+      queryParams: {
+        page: 1,
+        pageSize: 8,
+        begin_date: "",
+        end_date: "",
+        label: ""
+      }
     };
     that = this;
   }
@@ -53,17 +60,18 @@ export default class MyArticle extends Component {
     return paginationConfig;
   }
 
-  fetchData(page, pageSize) {
-    const queryParams = that.state.queryParams;
+  fetchData(queryParams) {
     const paginationConfig = that.state.paginationConfig;
-    paginationConfig.current = queryParams.page = page;
-    paginationConfig.pageSize = queryParams.pageSize = pageSize;
+    paginationConfig.current = queryParams.page;
+    paginationConfig.pageSize = queryParams.pageSize;
     request.reqGET("articlelist", {}, res => {
-      that.setState({ dataList: res.data });
-    });
-    that.setState({
-      queryParams: queryParams,
-      paginationConfig: paginationConfig
+      if (!res.code) {
+        that.setState({
+          dataList: res.data,
+          queryParams: queryParams,
+          paginationConfig: paginationConfig
+        });
+      }
     });
   }
 
@@ -102,14 +110,19 @@ export default class MyArticle extends Component {
         render: (text, row, index) => {
           return (
             <span>
-              <a className="action-aLink"
+              <a
+                className="action-aLink"
                 href="javascript:;"
                 onClick={() => that.goToPageDetail(row._id)}
               >
                 编辑
               </a>
               <span className="gap-line" />
-              <a className="action-aLink" href="javascript:;" onClick={() => that.deleteArticle(row)}>
+              <a
+                className="action-aLink"
+                href="javascript:;"
+                onClick={() => that.deleteArticle(row)}
+              >
                 删除
               </a>
             </span>
@@ -126,13 +139,27 @@ export default class MyArticle extends Component {
   deleteArticle(item) {
     let that = this;
     console.log(item);
-    request.reqPOST("deleteArticle", {...item}, res => {
+    request.reqPOST("deleteArticle", { ...item }, res => {
       console.log(res);
       that.fetchData();
     });
   }
 
+  selectChange(val) {
+    let queryParams = this.state.queryParams;
+    queryParams.label = val;
+    this.fetchData(queryParams);
+  }
+
+  datePickerChange(date, str) {
+    let queryParams = this.state.queryParams;
+    queryParams.begin_date = str[0];
+    queryParams.end_date = str[1];
+    this.fetchData(queryParams);
+  }
+
   render() {
+    let that = this;
     return (
       <div className="myArticle-page">
         <Form className="page-from">
@@ -143,7 +170,7 @@ export default class MyArticle extends Component {
                 labelCol={{ span: 5 }}
                 wrapperCol={{ span: 16 }}
               >
-                <DatePicker />
+                <RangePicker onChange={that.datePickerChange} />
               </Form.Item>
             </Col>
             <Col span={6}>
@@ -152,9 +179,12 @@ export default class MyArticle extends Component {
                 labelCol={{ span: 5 }}
                 wrapperCol={{ span: 16 }}
               >
-                <Select>
-                  <Option value="html">HTML</Option>
-                  <Option value="node">NODE</Option>
+                <Select onChange={that.selectChange}>
+                  <Option value="html">html</Option>
+                  <Option value="node">node</Option>
+                  <Option value="js">js</Option>
+                  <Option value="css">css</Option>
+                  <Option value="tool">tool</Option>
                 </Select>
               </Form.Item>
             </Col>

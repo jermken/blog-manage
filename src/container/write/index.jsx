@@ -1,11 +1,11 @@
 import React, { Component } from "react";
-import { Input, Button, Form, Row, Col, Modal } from "antd";
+import { Input, Button, Form, Row, Col, Modal, Select } from "antd";
 import "./index.scss";
 import marked from "marked";
 import request from "../../server/server.js";
 
 const { TextArea } = Input;
-
+const Option = Select.Option;
 export default class Write extends Component {
   constructor(props) {
     super(props);
@@ -125,16 +125,13 @@ export default class Write extends Component {
                 labelCol={{ span: 4 }}
                 wrapperCol={{ span: 16 }}
               >
-                <Input ref="label" />
-              </Form.Item>
-            </Col>
-            <Col span={4}>
-              <Form.Item
-                label="类型"
-                labelCol={{ span: 4 }}
-                wrapperCol={{ span: 16 }}
-              >
-                <Input ref="type" />
+                <Select>
+                  <Option value="html">html</Option>
+                  <Option value="node">node</Option>
+                  <Option value="js">js</Option>
+                  <Option value="css">css</Option>
+                  <Option value="tool">tool</Option>
+                </Select>
               </Form.Item>
             </Col>
             <Col span={4}>
