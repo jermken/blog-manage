@@ -20,7 +20,9 @@ export default class Write extends Component {
         title: "",
         label: "",
         author: ""
-      }
+      },
+      label: "",
+      time: new Date().getTime()
     };
   }
 
@@ -30,29 +32,31 @@ export default class Write extends Component {
 
   fetchData() {
     let that = this;
-    request.reqGET("articlelist", { _id: that.state.data._id }, res => {
-      let resData = res.data[0];
-      that.setState({ data: resData });
-      that.refs.title.input.value = resData.title;
-      that.refs.label.input.value = resData.label;
-      that.refs.type.input.value = resData.type;
-      that.refs.author.input.value = resData.author;
-    });
+    request.reqGET(
+      "articlelist",
+      { _id: that.state.data._id, isEdit: 1 },
+      res => {
+        let resData = res.data[0];
+        that.setState({ data: resData, label: resData.label, time: resData.time });
+        that.refs.title.input.value = resData.title;
+        that.refs.author.input.value = resData.author;
+      }
+    );
   }
 
   onSubmit() {
     const title = this.refs.title.input.value,
-      label = this.refs.label.input.value,
-      type = this.refs.type.input.value,
       author = this.refs.author.input.value,
-      content = this.state.data.content;
-    if (!title || !label || !type || !author || !content) {
+      content = this.state.data.content,
+      label = this.state.label;
+    if (!title || !label || !author || !content) {
       return Modal.error({
         title: "请将信息填写完整！",
         okText: "确定"
       });
     } else {
-      let obj = { title, label, type, author, content },
+      let time = new Date().getTime();
+      let obj = { title, label, author, content },
         _id = this.state.data._id;
       _id
         ? request.reqPOST("updateArticle", { ...obj, _id }, res => {
@@ -69,7 +73,7 @@ export default class Write extends Component {
               });
             }
           })
-        : request.reqPOST("addArticle", { ...obj }, res => {
+        : request.reqPOST("addArticle", { ...obj, time }, res => {
             if (!res.code) {
               Modal.success({
                 title: "新增成功！",
@@ -88,11 +92,42 @@ export default class Write extends Component {
     }
   }
 
+  onSave() {
+    const title = this.refs.title.input.value,
+      author = this.refs.author.input.value,
+      content = this.state.data.content,
+      {label,time} = this.state;
+    if (!title || !label || !author || !content) {
+      return Modal.error({
+        title: "请将信息填写完整！",
+        okText: "确定"
+      });
+    } else {
+      let obj = { title, label, author, content },
+        _id = this.state.data._id;
+      request.reqPOST("updateArticle", { ...obj, _id, time }, res => {
+        if (!res.code) {
+          Modal.success({
+            title: "保存成功！",
+            okText: "确定",
+            onOk: () => {}
+          });
+        } else {
+          Modal.error({
+            title: "",
+            content: res.msg
+          });
+        }
+      });
+    }
+  }
+
   clearQuery() {
     this.refs.title.input.value = "";
-    this.refs.label.input.value = "";
-    this.refs.type.input.value = "";
     this.refs.author.input.value = "";
+    this.setState({
+      label: ""
+    });
   }
 
   inputChange(e) {
@@ -101,11 +136,18 @@ export default class Write extends Component {
     });
   }
 
+  labelChange(val) {
+    this.setState({
+      label: val
+    });
+  }
+
   render() {
     const that = this;
     let content = marked(that.state.data.content)
       .replace(/<\/script/g, "<\\/script")
       .replace(/<!--/g, "<\\!--");
+    let { label } = that.state;
     return (
       <div className="write-page">
         <Form className="page-from">
@@ -125,7 +167,11 @@ export default class Write extends Component {
                 labelCol={{ span: 4 }}
                 wrapperCol={{ span: 16 }}
               >
-                <Select>
+                <Select
+                  ref="label"
+                  onSelect={that.labelChange.bind(this)}
+                  value={label}
+                >
                   <Option value="html">html</Option>
                   <Option value="node">node</Option>
                   <Option value="js">js</Option>
@@ -143,13 +189,21 @@ export default class Write extends Component {
                 <Input ref="author" />
               </Form.Item>
             </Col>
-            <Col span={4}>
+            <Col span={8}>
               <Form.Item>
                 <Button
                   onClick={that.clearQuery.bind(this)}
                   className="clear-btn"
                 >
                   清除
+                </Button>
+                <Button
+                  disabled={that.state.data._id ? false : true}
+                  onClick={that.onSave.bind(this)}
+                  className="clear-btn"
+                  type="primary"
+                >
+                  保存
                 </Button>
                 <Button onClick={that.onSubmit.bind(this)} type="primary">
                   提交

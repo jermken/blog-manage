@@ -23,53 +23,49 @@ export default class MyArticle extends Component {
     this.state = {
       columns: [],
       dataList: [],
-      paginationConfig: {},
       queryParams: {
         page: 1,
         pageSize: 8,
         begin_date: "",
         end_date: "",
-        label: ""
-      }
+        label: "",
+        title: "",
+        author: localStorage.getItem("author")
+      },
+      total: 0,
+      current: 1,
+      pageSize: 8
     };
     that = this;
   }
 
   componentWillMount() {
     const columns = this.initColumns();
-    const paginationConfig = this.initPagination();
-    this.fetchData();
+    const queryParams = this.state.queryParams;
+    this.fetchData(queryParams);
     this.setState({
-      columns: columns,
-      paginationConfig: paginationConfig
+      columns: columns
     });
   }
 
-  initPagination() {
-    const paginationConfig = {
-      current: 1,
-      total: 15,
-      pageSize: 6,
-      onChange: (page, pageSize) => {
-        that.fetchData(page, pageSize);
-      },
-      onShowSizeChange: (current, size) => {
-        that.fetchData();
-      }
-    };
-    return paginationConfig;
-  }
-
   fetchData(queryParams) {
-    const paginationConfig = that.state.paginationConfig;
-    paginationConfig.current = queryParams.page;
-    paginationConfig.pageSize = queryParams.pageSize;
-    request.reqGET("articlelist", {}, res => {
+    if (!queryParams.begin_date) {
+      queryParams.begin_date = 0;
+    } else {
+      queryParams.begin_date = new Date(queryParams.begin_date).getTime();
+    }
+    if (!queryParams.end_date) {
+      queryParams.end_date = new Date().getTime();
+    } else {
+      queryParams.end_date = new Date(queryParams.end_date).getTime();
+    }
+    request.reqGET("articlelist", { ...queryParams }, res => {
       if (!res.code) {
         that.setState({
-          dataList: res.data,
+          dataList: res.data[0],
           queryParams: queryParams,
-          paginationConfig: paginationConfig
+          total: res.data[2],
+          current: queryParams.page
         });
       }
     });
@@ -138,10 +134,9 @@ export default class MyArticle extends Component {
 
   deleteArticle(item) {
     let that = this;
-    console.log(item);
     request.reqPOST("deleteArticle", { ...item }, res => {
-      console.log(res);
-      that.fetchData();
+      let queryParams = this.state.queryParams;
+      that.fetchData(queryParams);
     });
   }
 
@@ -158,8 +153,20 @@ export default class MyArticle extends Component {
     this.fetchData(queryParams);
   }
 
+  queryArticle() {
+    let queryParams = this.state.queryParams;
+    queryParams.title = this.refs.label.input.value;
+    this.fetchData(queryParams);
+  }
+  pageChange(page, pageSize) {
+    let queryParams = this.state.queryParams;
+    queryParams.page = page;
+    queryParams.pageSize = pageSize;
+    this.fetchData(queryParams);
+  }
   render() {
     let that = this;
+    let { total, current, pageSize, queryParams } = that.state;
     return (
       <div className="myArticle-page">
         <Form className="page-from">
@@ -170,7 +177,7 @@ export default class MyArticle extends Component {
                 labelCol={{ span: 5 }}
                 wrapperCol={{ span: 16 }}
               >
-                <RangePicker onChange={that.datePickerChange} />
+                <RangePicker onChange={that.datePickerChange.bind(that)} />
               </Form.Item>
             </Col>
             <Col span={6}>
@@ -179,7 +186,7 @@ export default class MyArticle extends Component {
                 labelCol={{ span: 5 }}
                 wrapperCol={{ span: 16 }}
               >
-                <Select onChange={that.selectChange}>
+                <Select value={queryParams.label} onChange={that.selectChange.bind(that)}>
                   <Option value="html">html</Option>
                   <Option value="node">node</Option>
                   <Option value="js">js</Option>
@@ -194,12 +201,19 @@ export default class MyArticle extends Component {
                 labelCol={{ span: 5 }}
                 wrapperCol={{ span: 16 }}
               >
-                <Input />
+                <Input
+                  placeholder="请输入标题"
+                  ref="label"
+                />
               </Form.Item>
             </Col>
             <Col span={6}>
               <Form.Item>
-                <Button type="primary" className="search-btn">
+                <Button
+                  type="primary"
+                  className="search-btn"
+                  onClick={that.queryArticle.bind(that)}
+                >
                   查询
                 </Button>
               </Form.Item>
@@ -216,7 +230,11 @@ export default class MyArticle extends Component {
         <div className="pagination-wrap">
           <Pagination
             style={{ margin: "0 auto" }}
-            {...that.state.paginationConfig}
+            total={total}
+            onChange={that.pageChange.bind(this)}
+            current={current}
+            pageSize={pageSize}
+            defaultCurrent={1}
           />
         </div>
       </div>

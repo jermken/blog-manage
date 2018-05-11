@@ -16,7 +16,8 @@ const ArticleSchema = new Schema('Aritcle', {
     label: {type: 'string'},
     title: {type: 'string'},
     date: {type: 'string'},
-    content: {type: 'string'}
+    content: {type: 'string'},
+    time: {type: 'number'}
 })
 //----- Schema -----//
 

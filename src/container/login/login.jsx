@@ -36,6 +36,7 @@ export default class Login extends Component {
           width: "400px",
           onOk: () => (window.location.href = "/home")
         });
+        localStorage.setItem('author', userName);
       } else {
         Modal.error({
             title: "",
