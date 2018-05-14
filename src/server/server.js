@@ -1,6 +1,6 @@
 import 'whatwg-fetch';
 import apiConfig from './apiConfig';
-const publicPath = 'http://127.0.0.1:3000'; // https://nile.dev.xone.xin/api/
+const publicPath = 'http://127.0.0.1:9000'; // https://nile.dev.xone.xin/api/
 
 
 /* 判断响应的状态 */

@@ -8,7 +8,8 @@ import {
   Col,
   Button,
   Select,
-  DatePicker
+  DatePicker,
+  Modal
 } from "antd";
 import moment from "moment";
 import request from "../../server/server";
@@ -70,14 +71,24 @@ export default class MyArticle extends Component {
       }
     });
   }
-
+  formatTime(time) {
+    time = new Date(time);
+    let timeStr = '';
+    let year = time.getFullYear();
+    let month = time.getMonth() + 1;
+    month = month > 9 ? month : '0' + month;
+    let date = time.getDate();
+    timeStr = year + '-' + month + '-' + date;
+    return timeStr;
+  }
   initColumns() {
+    let that = this;
     return [
       {
         title: "日期",
-        dataIndex: "date",
+        dataIndex: "time",
         render: (text, row, index) => {
-          return <span>{text}</span>;
+          return <span>{that.formatTime(text)}</span>;
         }
       },
       {
@@ -133,10 +144,22 @@ export default class MyArticle extends Component {
   }
 
   deleteArticle(item) {
-    let that = this;
+    let { queryParams } = this.state;
     request.reqPOST("deleteArticle", { ...item }, res => {
-      let queryParams = this.state.queryParams;
-      that.fetchData(queryParams);
+      if (!res.code) {
+        Modal.success({
+          title: "删除成功！",
+          okText: "确定",
+          onOk: () => {
+            that.fetchData(queryParams);
+          }
+        });
+      } else {
+        Modal.error({
+            title: "",
+            content: res.msg
+          });
+      }
     });
   }
 

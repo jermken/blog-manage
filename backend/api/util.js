@@ -8,23 +8,26 @@ const util = {
      */
     getHandler: (app, url, wokerFn) => {
         app.get(url, checkLogin, (req, res) => {
-            res.header("Access-Control-Allow-Origin", "http://localhost:3000");
+            res.header("Access-Control-Allow-Origin", "*");
+            res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
+            res.header("Access-Control-Allow-Headers", "X-Requested-With");
+            res.header('Access-Control-Allow-Headers', 'Content-Type');
             res.header("Access-Control-Allow-Credentials", true);
             wokerFn(req, res).then((resData) => {
-                if(!resData) {
+                if (!resData) {
                     res.send({
                         code: 0,
                         data: []
                     });
                     return res.end();
                 }
-                resData = Object.prototype.toString.call(resData) === '[object Array]'? resData : [resData];
+                resData = Object.prototype.toString.call(resData) === '[object Array]' ? resData : [resData];
                 res.send({
                     code: 0,
                     data: resData
                 });
                 res.end();
-            }).catch(()=>{
+            }).catch(() => {
                 res.send({
                     code: 100,
                     msg: '服务器异常！'
@@ -41,9 +44,10 @@ const util = {
      */
     postHandler: (app, url, wokerFn) => {
         app.use(url, checkLogin, (req, res) => {
-            res.header("Access-Control-Allow-Origin", "http://localhost:3000");
-            res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-            res.header("Access-Control-Allow-Methods", "GET, POST, PUT");
+            res.header("Access-Control-Allow-Origin", "*");
+            res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
+            res.header("Access-Control-Allow-Headers", "X-Requested-With");
+            res.header('Access-Control-Allow-Headers', 'Content-Type');
             res.header("Access-Control-Allow-Credentials", true);
             wokerFn(req, res);
         });
@@ -56,9 +60,10 @@ const util = {
      */
     noCheckHandler: (app, url, wokerFn) => {
         app.use(url, (req, res) => {
-            res.header("Access-Control-Allow-Origin", "http://localhost:3000");
-            res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-            res.header("Access-Control-Allow-Methods", "GET, POST, PUT");
+            res.header("Access-Control-Allow-Origin", "*");
+            res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
+            res.header("Access-Control-Allow-Headers", "X-Requested-With");
+            res.header('Access-Control-Allow-Headers', 'Content-Type');
             res.header("Access-Control-Allow-Credentials", true);
             wokerFn(req, res);
         });
