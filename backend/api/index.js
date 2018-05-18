@@ -157,6 +157,19 @@ const apiRouters = app => {
         res.end();
       });
   });
+  // 退出登录接口
+  postHandler(app, "/api/loginout.json", (req, res) => {
+    return User.query({ name: req.body.name }).then(result => {
+      if (result) {
+        req.session.user = null;
+        res.send({
+          code: 0,
+          msg: "退出登录成功！"
+        });
+        res.end();
+      }
+    });
+  });
 };
 
 module.exports = apiRouters;

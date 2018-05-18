@@ -1,4 +1,4 @@
-const Mongolass = require( 'mongolass')
+const Mongolass = require('mongolass')
 const mongodbConfig = require('../config/config.js').mongodbConfig
 const Schema = Mongolass.Schema
 const mongolass = new Mongolass()
