@@ -5,4 +5,5 @@ import BookRecommend from './bookRecommend';
 import MyArticle from './myArticle';
 import ToolUse from './toolUse';
 import Write from './write';
-export { Home, Login, BookRecommend, MyArticle, ToolUse, Write, LoginUp };
+import DayConsume from './dayConsume';
+export { Home, Login, BookRecommend, MyArticle, ToolUse, Write, LoginUp, DayConsume };

@@ -7,8 +7,10 @@ import MyArticle from "../myArticle";
 import Write from "../write";
 import ToolUse from "../toolUse";
 import BookRecommend from "../bookRecommend";
+import DayConsume from '../dayConsume';
 import request from "../../server/server.js";
 
+const SubMenu = Menu.SubMenu;
 export default class Home extends Component {
   constructor(props) {
     super(props);
@@ -65,6 +67,7 @@ export default class Home extends Component {
             <Menu
               theme="dark"
               defaultSelectedKeys={that.state.defaultSelectedMenu}
+              mode="inline"
             >
               <Menu.Item key="/home/myArticle">
                 <Link to="/home/myArticle">
@@ -90,6 +93,27 @@ export default class Home extends Component {
                   <span>书籍推荐</span>
                 </Link>
               </Menu.Item>
+              <SubMenu key="/home/YBS" title={<span>依柏诗manage</span>}>
+                <Menu.Item key="/home/YBS/dayConsume">
+                  <Link to="/home/YBS/dayConsume">
+                    <span>消费记录</span>
+                  </Link>
+                </Menu.Item>
+                <Menu.Item key="/home/YBS/historyActive">
+                  <Link to="/home/YBS/historyActive">
+                    <span>优惠活动表</span>
+                  </Link>
+                </Menu.Item>
+                <Menu.Item key="/home/YBS/3">
+                  <span>客户信息</span>
+                </Menu.Item>
+                <Menu.Item key="/home/YBS/4">
+                  <span>库存管理</span>
+                </Menu.Item>
+                <Menu.Item key="/home/YBS/5">
+                  <span>员工信息</span>
+                </Menu.Item>
+              </SubMenu>
             </Menu>
           </div>
           <div className="main-right-body">
@@ -103,6 +127,7 @@ export default class Home extends Component {
               <Route path="/home/write" component={Write} />
               <Route path="/home/toolUse" component={ToolUse} />
               <Route path="/home/bookRecommend" component={BookRecommend} />
+              <Route path="/home/YBS/dayConsume" component={DayConsume} />
             </div>
           </div>
         </div>

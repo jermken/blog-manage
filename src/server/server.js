@@ -1,6 +1,6 @@
 import 'whatwg-fetch';
 import apiConfig from './apiConfig';
-const publicPath = 'http://127.0.0.1:9000'; // https://nile.dev.xone.xin/api/
+const publicPath = '//manage.jermken.com';
 
 
 /* 判断响应的状态 */
@@ -42,7 +42,7 @@ const xmlHttpReq = {
     reqPOST: (url, data, cb) => {
         let time = new Date();
         time = time.getTime();
-        url = apiConfig[url] + '?_time_=' + time;
+        url = publicPath + apiConfig[url] + '?_time_=' + time;
         fetch(url,{
             method: 'POST',
             body: JSON.stringify(data),
@@ -65,7 +65,7 @@ const xmlHttpReq = {
     reqGET: (url, data, cb) => {
         let time = new Date();
         time = time.getTime();
-        let URL = apiConfig[url] + '?_time_=' + time + '&' + objectToStr(data);
+        let URL = publicPath + apiConfig[url] + '?_time_=' + time + '&' + objectToStr(data);
         fetch(URL,{
             credentials: 'include'
         })

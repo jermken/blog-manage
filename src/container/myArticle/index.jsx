@@ -43,7 +43,7 @@ export default class MyArticle extends Component {
   componentWillMount() {
     const columns = this.initColumns();
     const queryParams = this.state.queryParams;
-    this.fetchData(queryParams);
+    //this.fetchData(queryParams);
     this.setState({
       columns: columns
     });
