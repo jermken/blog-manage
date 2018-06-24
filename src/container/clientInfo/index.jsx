@@ -17,83 +17,16 @@ import {
 import "./index.scss";
 const Option = Select.Option;
 const { RangePicker } = DatePicker;
-export default class DayConsume extends Component {
+export default class ClientInfo extends Component {
   constructor(props) {
     super(props);
     this.state = {
       columns: [],
       validateStatus: {
-        userName: false,
-        projectName: false,
-        paymentWay: false,
-        serverName: false,
-        amount: false
+        
       },
       detailVisble: false,
-      projectList: [
-        {
-          text: "洗脸",
-          value: "1"
-        },
-        {
-          text: "美甲",
-          value: "2"
-        },
-        {
-          text: "脱毛",
-          value: "3"
-        },
-        {
-          text: "化妆",
-          value: "4"
-        },
-        {
-          text: "修眉",
-          value: "5"
-        }
-      ],
-      dataList: [
-        {
-          time: "2018-06-22",
-          userName: "客户1",
-          sexual: "1",
-          serverName: {
-            text: '小李子',
-            value: '1'
-          },
-          projectList: [{
-            text: "洗脸",
-            value: "1"
-          },
-          {
-            text: "美甲",
-            value: "2"
-          }],
-          amount: "230",
-          paymentWay: ["wechat", "cash"],
-          desc:
-          "这是第二次进店，这是第三次进店，这是第四次进店这是第二次进店，这是第三次进店，这是第四次进店",
-          id: "erwen23432432n"
-        },
-        {
-          time: "2018-06-22",
-          userName: "客户1",
-          sexual: "1",
-          serverName: {
-            text: '小婷子',
-            value: '2'
-          },
-          projectList: [{
-            text: "美甲",
-            value: "2"
-          }],
-          amount: "230",
-          paymentWay: ["card"],
-          desc:
-          "这是第二次进店，这是第三次进店，这是第四次进店这是第二次进店，这是第三次进店，这是第四次进店",
-          id: "erwen2343332432n"
-        }
-      ],
+      dataList: [],
       tableLoading: false,
       queryParams: {
         startT: "",
@@ -105,14 +38,7 @@ export default class DayConsume extends Component {
       total: 1,
       current: 1,
       pageSize: 10,
-      detailData: {
-        userName: "",
-        projectList: [],
-        serverName: {},
-        amount: "",
-        paymentWay: [],
-        desc: ""
-      }
+      detailData: {}
     };
   }
   componentWillMount() {
@@ -135,15 +61,15 @@ export default class DayConsume extends Component {
       {
         title: "客户姓名",
         dataIndex: "userName",
-        width: 150,
+        width: 100,
         render: (text, row, index) => {
           return <span>{text}</span>;
         }
       },
       {
-        title: "项目",
-        dataIndex: "projectList",
-        width: 250,
+        title: "联系方式",
+        dataIndex: "contact",
+        width: 200,
         render: (text, row, index) => {
           return (
             <span>
@@ -157,35 +83,35 @@ export default class DayConsume extends Component {
         }
       },
       {
-        title: "金额",
-        dataIndex: "amount",
+        title: "性别",
+        dataIndex: "sexual",
         width: 150,
         render: (text, row, index) => {
           return <span>{"￥" + text}</span>;
         }
       },
       {
-        title: "付款方式",
-        dataIndex: "paymentWay",
-        width: 200,
+        title: "是否会员",
+        dataIndex: "vip",
+        width: 150,
         render: (text, row, index) => {
-          return (
-            <span>
-              {text.map(val => (
-                <Tag key={val} color={that.transPaymentWay(val).color}>
-                  {that.transPaymentWay(val).text}
-                </Tag>
-              ))}
-            </span>
-          );
+          return <span>{text}</span>;
         }
       },
       {
-        title: "服务人",
-        dataIndex: "serverName",
+        title: "余额",
+        dataIndex: "balance",
         width: 150,
         render: (text, row, index) => {
-          return <span>{text.text}</span>;
+          return <span>{text}</span>;
+        }
+      },
+      {
+        title: "活动",
+        dataIndex: "activeList",
+        width: 150,
+        render: (text, row, index) => {
+          return <span>{text}</span>;
         }
       },
       {
@@ -231,49 +157,9 @@ export default class DayConsume extends Component {
   showDetail(row) {
     let detailData = this.state.detailData;
     detailData = {
-      userName: row.userName,
-      projectList: row.projectList.map(i => i.value),
-      serverName: row.serverName,
-      amount: row.amount,
-      paymentWay: row.paymentWay,
-      desc: row.desc
+      
     };
     this.setState({ detailVisble: true, detailData: detailData });
-  }
-  transPaymentWay(str) {
-    var obj;
-    switch (str) {
-      case "wechat":
-        obj = {
-          text: "微信",
-          color: "green"
-        };
-        break;
-      case "alipay":
-        obj = {
-          text: "支付宝",
-          color: "cyan"
-        };
-        break;
-      case "cash":
-        obj = {
-          text: "现金",
-          color: "blue"
-        };
-        break;
-      case "card":
-        obj = {
-          text: "刷卡",
-          color: "gold"
-        };
-        break;
-      default:
-        obj = {
-          text: "其他",
-          color: "purple"
-        };
-    }
-    return obj;
   }
   datePickerChange() { }
 
@@ -282,15 +168,10 @@ export default class DayConsume extends Component {
   queryTableList() { }
 
   pageChange() { }
-  addConsume() {
+  addUser() {
     let detailData = this.state.detailData;
     detailData = {
-      userName: "",
-      projectList: [],
-      serverName: "",
-      amount: "",
-      paymentWay: [],
-      desc: ""
+      
     };
     this.setState({ detailVisble: true, detailData: detailData });
   }
@@ -339,14 +220,14 @@ export default class DayConsume extends Component {
     } = that.state;
     const { TextArea } = Input;
     return (
-      <div className="dayconsume-page">
+      <div className="clientInfo-page">
         <Form className="page-from">
           <Row>
-            <Col span={6}>
+            <Col span={5}>
               <Form.Item
                 label="日期"
-                labelCol={{ span: 5 }}
-                wrapperCol={{ span: 16 }}
+                labelCol={{ span: 3 }}
+                wrapperCol={{ span: 18 }}
               >
                 <RangePicker onChange={that.datePickerChange.bind(that)} />
               </Form.Item>
@@ -362,7 +243,16 @@ export default class DayConsume extends Component {
             </Col>
             <Col span={4}>
               <Form.Item
-                label="服务人"
+                label="会员vip"
+                labelCol={{ span: 8 }}
+                wrapperCol={{ span: 16 }}
+              >
+                <Input placeholder="请输入会员号" ref="vipCode" />
+              </Form.Item>
+            </Col>
+            <Col span={3}>
+              <Form.Item
+                label="开卡人"
                 labelCol={{ span: 8 }}
                 wrapperCol={{ span: 16 }}
               >
@@ -370,15 +260,10 @@ export default class DayConsume extends Component {
                   value={queryParams.serverName}
                   onChange={that.selectChange.bind(that)}
                 >
-                  <Option value="html">服务人1</Option>
-                  <Option value="node">服务人2</Option>
-                  <Option value="js">服务人3</Option>
-                  <Option value="css">服务人4</Option>
-                  <Option value="tool">服务人5</Option>
                 </Select>
               </Form.Item>
             </Col>
-            <Col span={4}>
+            <Col span={3}>
               <Form.Item
                 label="性别"
                 labelCol={{ span: 8 }}
@@ -388,12 +273,11 @@ export default class DayConsume extends Component {
                   value={queryParams.sexual}
                   onChange={that.selectChange.bind(that)}
                 >
-                  <Option value="1">女士</Option>
-                  <Option value="2">男士</Option>
+                  
                 </Select>
               </Form.Item>
             </Col>
-            <Col span={6}>
+            <Col span={5}>
               <Form.Item>
                 <Button
                   type="primary"
@@ -404,7 +288,7 @@ export default class DayConsume extends Component {
                 </Button>
                 <Button
                   className="search-btn"
-                  onClick={that.addConsume.bind(that)}
+                  onClick={that.addUser.bind(that)}
                 >
                   新增
                 </Button>
@@ -448,12 +332,7 @@ export default class DayConsume extends Component {
               validateStatus={validateStatus.userName ? "error" : ""}
               help={validateStatus.userName ? "请输入客户姓名" : ""}
             >
-              <Input
-                value={detailData.userName}
-                placeholder="请输入客户姓名"
-                data-type="userName"
-                onChange={that.detailIptChange.bind(that)}
-              />
+
             </Form.Item>
             <Form.Item
               label="项目"
@@ -463,16 +342,8 @@ export default class DayConsume extends Component {
               validateStatus={validateStatus.projectName ? "error" : ""}
               help={validateStatus.projectName ? "请选择项目" : ""}
             >
-              <Select
-                onChange={that.detailProjectChange.bind(that)}
-                value={detailData.projectList}
-                mode="multiple"
-              >
-                {projectList.map(i => (
-                  <Option key={i.value} value={i.value}>
-                    {i.text}
-                  </Option>
-                ))}
+              <Select>
+               
               </Select>
             </Form.Item>
             <Form.Item
@@ -488,10 +359,6 @@ export default class DayConsume extends Component {
                 value={detailData.paymentWay}
                 mode="multiple"
               >
-                <Option value="wechat">微信</Option>
-                <Option value="alipay">支付宝</Option>
-                <Option value="card">刷卡</Option>
-                <Option value="cash">现金</Option>
               </Select>
             </Form.Item>
             <Form.Item
@@ -502,12 +369,8 @@ export default class DayConsume extends Component {
               validateStatus={validateStatus.serverName ? "error" : ""}
               help={validateStatus.serverName ? "请输入服务人员" : ""}
             >
-              <Select
-                onChange={that.detailServerNameChange.bind(that)}
-                value={detailData.serverName.value}
-              >
-                <Option value="1">小李子</Option>
-                <Option value="2">小婷子</Option>
+              <Select>
+                
               </Select>
             </Form.Item>
             <Form.Item
@@ -518,19 +381,14 @@ export default class DayConsume extends Component {
               validateStatus={validateStatus.amount ? "error" : ""}
               help={validateStatus.amount ? "请输入消费金额" : ""}
             >
-              <InputNumber value={detailData.amount} min={0} precision={1} />
+
             </Form.Item>
             <Form.Item
               label="备注"
               labelCol={{ span: 4 }}
               wrapperCol={{ span: 16 }}
             >
-              <TextArea
-                onChange={that.detailIptChange.bind(that)}
-                data-type="desc"
-                value={detailData.desc}
-                rows={4}
-              />
+
             </Form.Item>
           </Form>
         </Modal>

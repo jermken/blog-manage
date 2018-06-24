@@ -8,6 +8,7 @@ import Write from "../write";
 import ToolUse from "../toolUse";
 import BookRecommend from "../bookRecommend";
 import DayConsume from '../dayConsume';
+import ClientInfo from '../clientInfo';
 import request from "../../server/server.js";
 
 const SubMenu = Menu.SubMenu;
@@ -104,8 +105,10 @@ export default class Home extends Component {
                     <span>优惠活动表</span>
                   </Link>
                 </Menu.Item>
-                <Menu.Item key="/home/YBS/3">
-                  <span>客户信息</span>
+                <Menu.Item key="/home/YBS/clientInfo">
+                  <Link to="/home/YBS/clientInfo">
+                    <span>客户信息</span>
+                  </Link>
                 </Menu.Item>
                 <Menu.Item key="/home/YBS/4">
                   <span>库存管理</span>
@@ -128,6 +131,7 @@ export default class Home extends Component {
               <Route path="/home/toolUse" component={ToolUse} />
               <Route path="/home/bookRecommend" component={BookRecommend} />
               <Route path="/home/YBS/dayConsume" component={DayConsume} />
+              <Route path="/home/YBS/clientInfo" component={ClientInfo} />
             </div>
           </div>
         </div>
