@@ -13,18 +13,15 @@ import {
   Tooltip,
   Tag,
   InputNumber,
-  Avatar,
-  Radio
+  Avatar
 } from "antd";
 import "./index.scss";
 import request from "../../server/server";
-import vipIcon from "../../asset/image/vip_client.png";
-import noVipIcon from "../../asset/image/no_vip_client.png";
+import vipIcon from '../../asset/image/vip_client.png';
+import noVipIcon from '../../asset/image/no_vip_client.png';
 const Option = Select.Option;
 const { RangePicker } = DatePicker;
-const RadioGroup = Radio.Group;
-const { TextArea } = Input;
-export default class ClientInfo extends Component {
+export default class ActiveList extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -36,24 +33,19 @@ export default class ClientInfo extends Component {
       queryParams: {
         startT: "",
         endT: "",
-        name: "",
-        vipCode: "",
-        booker: "",
-        sexual: "",
-        isVip: 0,
-        page: 1,
-        pageSize: 8
+        userName: "",
+        sexual: "1",
+        serverName: ""
       },
       total: 1,
       current: 1,
       pageSize: 10,
-      detailData: {},
-      serverName: []
+      detailData: {}
     };
   }
   componentWillMount() {
     this.initColumns();
-    //this.fetchData(this.state.queryParams);
+    //this.fetchData();
     let data = [
       {
         name: "张一",
@@ -64,7 +56,7 @@ export default class ClientInfo extends Component {
         sexual: 2,
         booker: "小杰",
         _id: "fdsfsd345d",
-        contact: "13212387654",
+        contact: '13212387654',
         balance: 123,
         activeList: []
       },
@@ -77,34 +69,29 @@ export default class ClientInfo extends Component {
         sexual: 1,
         booker: "小婷",
         _id: "fdsfsd34de5d",
-        contact: "13212387654",
+        contact: '13212387654',
         balance: 343,
         activeList: []
       }
     ];
     this.setState({ dataList: data });
   }
-  fetchData(queryParams) {
+  fetchData() {
     let that = this;
-    request.reqGET("epsUserList", { ...queryParams }, res => {
+    request.reqGET("epsUserList", { name: "" }, res => {
       if (!res.code) {
         that.setState({ dataList: res.data });
-      } else {
-        Modal.error({
-          title: "",
-          content: res.msg
-        });
       }
     });
   }
   formatTime(time) {
     time = new Date(time);
-    let timeStr = "";
+    let timeStr = '';
     let year = time.getFullYear();
     let month = time.getMonth() + 1;
-    month = month > 9 ? month : "0" + month;
+    month = month > 9 ? month : '0' + month;
     let date = time.getDate();
-    timeStr = year + "-" + month + "-" + date;
+    timeStr = year + '-' + month + '-' + date;
     return timeStr;
   }
   initColumns() {
@@ -115,19 +102,7 @@ export default class ClientInfo extends Component {
         dataIndex: "name",
         width: 150,
         render: (text, row, index) => {
-          return (
-            <span>
-              <Avatar
-                size="large"
-                src={
-                  row.avatar
-                    ? row.avatar
-                    : "https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-                }
-              />
-              <span>{text}</span>
-            </span>
-          );
+          return <span><Avatar size="large" src={row.avatar? row.avatar : "https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"}/><span>{text}</span></span>;
         }
       },
       {
@@ -151,13 +126,7 @@ export default class ClientInfo extends Component {
         dataIndex: "sexual",
         width: 150,
         render: (text, row, index) => {
-          return (
-            <span>
-              <Tag color={text == 1 ? "#fcb200" : "#2db7f5"}>
-                {text == 1 ? "女" : "男"}
-              </Tag>
-            </span>
-          );
+          return <span><Tag color={text == 1? '#fcb200' : '#2db7f5'}>{text == 1 ? '女' : '男'}</Tag></span>;
         }
       },
       {
@@ -165,9 +134,7 @@ export default class ClientInfo extends Component {
         dataIndex: "isVip",
         width: 150,
         render: (text, row, index) => {
-          return (
-            <span>{text ? <Avatar size="large" src={vipIcon} /> : ""}</span>
-          );
+        return <span>{text? <Avatar size="large" src={vipIcon}/> : ''}</span>;
         }
       },
       {
@@ -183,7 +150,7 @@ export default class ClientInfo extends Component {
         dataIndex: "activeList",
         width: 150,
         render: (text, row, index) => {
-          return <span>{text.length ? text : "-"}</span>;
+          return <span>{text.length? text : '-'}</span>;
         }
       },
       {
@@ -193,14 +160,14 @@ export default class ClientInfo extends Component {
         render: (text, row, index) => {
           return (
             <Tooltip title={text}>
-              <span className="table-desc">{text || "-"}</span>
+              <span className="table-desc">{text || '-'}</span>
             </Tooltip>
           );
         }
       },
       {
         title: "操作",
-        width: 200,
+        width: 150,
         render: (text, row, index) => {
           return (
             <span>
@@ -211,7 +178,7 @@ export default class ClientInfo extends Component {
               >
                 编辑
               </a>
-              <span className="gap-line"></span>
+              <span className="gap-line" />
               <a
                 className="action-aLink"
                 href="javascript:;"
@@ -219,14 +186,6 @@ export default class ClientInfo extends Component {
               >
                 删除
               </a>
-              {row.isVip ? <span className="gap-line"></span> : ''}
-              {row.isVip? <a
-                className="action-aLink"
-                href="javascript:;"
-                onClick={() => that.deleteList(row.id)}
-              >
-                充值
-              </a> : ''}
             </span>
           );
         }
@@ -243,91 +202,16 @@ export default class ClientInfo extends Component {
 
   selectChange() {}
 
-  queryTableList() {
-    this.fetchData(this.state.queryParams);
-  }
+  queryTableList() {}
 
   pageChange() {}
   addUser() {
-    let detailData = {
-      name: "",
-      create_time: 0,
-      update_time: 0,
-      isVip: false,
-      vipCode: "",
-      sexual: '1',
-      booker: "",
-      contact: "",
-      balance: 0
-    };
+    let detailData = this.state.detailData;
+    detailData = {};
     this.setState({ detailVisble: true, detailData: detailData });
   }
-  checkEditInfo(detailData) {
-    let isValidate = true;
-    let { validateStatus } = this.state;
-    if (!detailData.name) {
-      validateStatus.name.error = 'error';
-      validateStatus.name.help = '请输入客户姓名';
-      isValidate = false;
-    } else {
-      validateStatus.name.error = '';
-      validateStatus.name.help = '';
-    }
-    if (!detailData.booker) {
-      validateStatus.booker.error = 'error';
-      validateStatus.booker.help = '请选择登记人';
-      isValidate = false;
-    } else {
-      validateStatus.booker.error = '';
-      validateStatus.booker.help = '';
-    }
-    if (detailData.contact && /^[1][3,4,5,7,8][0-9]{9}$/.test(detailData.contact)) {
-      validateStatus.contact.error = 'error';
-      validateStatus.contact.help = '手机号码格式有误';
-      isValidate = false;
-    } else {
-      validateStatus.contact.error = '';
-      validateStatus.contact.help = '';
-    }
-    this.setState({validateStatus: validateStatus});
-    return isValidate;
-  }
   handleEdit() {
-    let that = this;
-    let { detailData } = that.state;
-    let create_time = +new Date();
-    let update_time = create_time;
-    if (this.checkEditInfo(detailData)) {
-      let { _id } = detailData._id;
-      _id ? request.reqPOST("epsEditUser", { ...detailData, update_time, _id }, res => {
-        if (!res.code) {
-          Modal.success({
-            title: "编辑成功！",
-            okText: "确定",
-            onOk: () => {}
-          });
-        } else {
-          Modal.error({
-            title: "",
-            content: res.msg
-          });
-        }
-      }) : request.reqPOST("epsAddUser", { ...detailData, create_time, update_time }, res => {
-        if (!res.code) {
-          Modal.success({
-            title: "新增成功！",
-            okText: "确定",
-            onOk: () => {}
-          });
-          that.setState({detailVisble: false});
-        } else {
-          Modal.error({
-            title: "",
-            content: res.msg
-          });
-        }
-      })
-    }
+    this.setState({ detailVisble: false });
   }
   editCancel() {
     this.setState({ detailVisble: false });
@@ -336,17 +220,22 @@ export default class ClientInfo extends Component {
     let val = e.target.value,
       type = e.target.dataset.type,
       detailData = this.state.detailData;
-    detailData[type] = val.replace(/(^\s+)|(\s+$)/g,"");
+    detailData[type] = val;
     this.setState({ detailData: detailData });
   }
-  detailSexualChange(e) {
+  detailProjectChange(e) {
     let detailData = this.state.detailData;
-    detailData.sexual = e;
+    detailData.projectList = e;
     this.setState({ detailData: detailData });
   }
-  detailBookerChange(e) {
+  detailPaymentWayChange(e) {
     let detailData = this.state.detailData;
-    detailData.booker = e;
+    detailData.paymentWay = e;
+    this.setState({ detailData: detailData });
+  }
+  detailServerNameChange(e) {
+    let detailData = this.state.detailData;
+    detailData.serverName.value = e;
     this.setState({ detailData: detailData });
   }
   render() {
@@ -362,8 +251,7 @@ export default class ClientInfo extends Component {
       detailVisble,
       projectList,
       validateStatus,
-      detailData,
-      serverName
+      detailData
     } = that.state;
     const { TextArea } = Input;
     return (
@@ -380,13 +268,13 @@ export default class ClientInfo extends Component {
                   <RangePicker onChange={that.datePickerChange.bind(that)} />
                 </Form.Item>
               </Col>
-              <Col span={3}>
+              <Col span={4}>
                 <Form.Item
                   label="客户姓名"
                   labelCol={{ span: 8 }}
                   wrapperCol={{ span: 16 }}
                 >
-                  <Input placeholder="请输入姓名" ref="userName" />
+                  <Input placeholder="请输入客户姓名" ref="userName" />
                 </Form.Item>
               </Col>
               <Col span={4}>
@@ -400,20 +288,14 @@ export default class ClientInfo extends Component {
               </Col>
               <Col span={3}>
                 <Form.Item
-                  label="登记人"
+                  label="开卡人"
                   labelCol={{ span: 8 }}
                   wrapperCol={{ span: 16 }}
                 >
                   <Select
                     value={queryParams.serverName}
                     onChange={that.selectChange.bind(that)}
-                  >
-                    {serverName.map(i => (
-                      <Option value={i._id} key={i._id}>
-                        {i.text}
-                      </Option>
-                    ))}
-                  </Select>
+                  />
                 </Form.Item>
               </Col>
               <Col span={3}>
@@ -425,39 +307,28 @@ export default class ClientInfo extends Component {
                   <Select
                     value={queryParams.sexual}
                     onChange={that.selectChange.bind(that)}
-                  >
-                    <Option value="1">女士</Option>
-                    <Option value="2">男士</Option>
-                  </Select>
+                  />
                 </Form.Item>
               </Col>
-              <Col span={6}>
-                <Form.Item
-                  label="会员"
-                  labelCol={{ span: 6 }}
-                  wrapperCol={{ span: 16 }}
-                >
-                  <RadioGroup>
-                    <Radio>全部</Radio>
-                    <Radio>会员</Radio>
-                    <Radio>非会员</Radio>
-                  </RadioGroup>
+              <Col span={5}>
+                <Form.Item>
+                  <Button
+                    type="primary"
+                    className="search-btn"
+                    onClick={that.queryTableList.bind(that)}
+                  >
+                    查询
+                  </Button>
+                  <Button
+                    className="search-btn"
+                    onClick={that.addUser.bind(that)}
+                  >
+                    新增
+                  </Button>
                 </Form.Item>
               </Col>
             </Row>
           </Form>
-          <div className="btn-area">
-            <Button
-              type="primary"
-              className="btn-area_item"
-              onClick={that.queryTableList.bind(that)}
-            >
-              查询
-            </Button>
-            <Button className="btn-area_item" onClick={that.addUser.bind(that)}>
-              新增
-            </Button>
-          </div>
         </div>
         <Table
           size="small"
@@ -478,7 +349,7 @@ export default class ClientInfo extends Component {
           />
         </div>
         <Modal
-          title="客户信息"
+          title="消费详情"
           visible={detailVisble}
           onOk={that.handleEdit.bind(that)}
           onCancel={that.editCancel.bind(that)}
@@ -492,87 +363,56 @@ export default class ClientInfo extends Component {
               labelCol={{ span: 4 }}
               wrapperCol={{ span: 10 }}
               required={true}
-            >
-              <Input
-                value={detailData.name}
-                placeholder="请输入客户姓名"
-                data-type="userName"
-                onChange={that.detailIptChange.bind(that)}
-              />
-            </Form.Item>
+              validateStatus={validateStatus.userName ? "error" : ""}
+              help={validateStatus.userName ? "请输入客户姓名" : ""}
+            />
             <Form.Item
-                  label="性别"
-                  labelCol={{ span: 4 }}
-                  wrapperCol={{ span: 10 }}
-                >
-                  <Select
-                    value={detailData.sexual}
-                    onChange={that.detailSexualChange.bind(that)}
-                  >
-                    <Option value="1">女士</Option>
-                    <Option value="2">男士</Option>
-                  </Select>
-                </Form.Item>
-            <Form.Item
-              label="出生日期"
+              label="项目"
               labelCol={{ span: 4 }}
-              wrapperCol={{ span: 10 }}
-            >
-              <Input
-                value={detailData.birthday}
-                placeholder="请输入出生日期"
-                data-type="birthday"
-                onChange={that.detailIptChange.bind(that)}
-              />
-            </Form.Item>
-            <Form.Item
-              label="联系方式"
-              labelCol={{ span: 4 }}
-              wrapperCol={{ span: 10 }}
-            >
-              <Input
-                value={detailData.contact}
-                placeholder="请输入联系方式"
-                data-type="contact"
-                onChange={that.detailIptChange.bind(that)}
-              />
-            </Form.Item>
-            <Form.Item
-              label="登记人"
-              labelCol={{ span: 4 }}
-              wrapperCol={{ span: 10 }}
+              wrapperCol={{ span: 20 }}
               required={true}
+              validateStatus={validateStatus.projectName ? "error" : ""}
+              help={validateStatus.projectName ? "请选择项目" : ""}
+            >
+              <Select />
+            </Form.Item>
+            <Form.Item
+              label="付款方式"
+              labelCol={{ span: 4 }}
+              wrapperCol={{ span: 16 }}
+              required={true}
+              validateStatus={validateStatus.paymentWay ? "error" : ""}
+              help={validateStatus.paymentWay ? "请选择付款方式" : ""}
             >
               <Select
-              value={detailData.booker}
-              onChange={that.detailBookerChange.bind(that)}
-              >
-                {serverName.map(i => (
-                  <Option value={i._id} key={i._id}>
-                    {i.text}
-                  </Option>
-                ))}
-              </Select>
+                onChange={that.detailPaymentWayChange.bind(that)}
+                value={detailData.paymentWay}
+                mode="multiple"
+              />
             </Form.Item>
             <Form.Item
-              label="余额"
+              label="服务人"
               labelCol={{ span: 4 }}
-              wrapperCol={{ span: 10 }}
+              wrapperCol={{ span: 16 }}
+              required={true}
+              validateStatus={validateStatus.serverName ? "error" : ""}
+              help={validateStatus.serverName ? "请输入服务人员" : ""}
             >
-              <Input value={detailData.balance} disabled/>
+              <Select />
             </Form.Item>
+            <Form.Item
+              label="金额"
+              labelCol={{ span: 4 }}
+              wrapperCol={{ span: 14 }}
+              required={true}
+              validateStatus={validateStatus.amount ? "error" : ""}
+              help={validateStatus.amount ? "请输入消费金额" : ""}
+            />
             <Form.Item
               label="备注"
               labelCol={{ span: 4 }}
-              wrapperCol={{ span: 18 }}
-              value={detailData.desc}
-              onChange={that.detailIptChange.bind(that)}
-              data-type="desc"
-            >
-            <TextArea
-            rows={4}
-            ></TextArea>
-            </Form.Item>
+              wrapperCol={{ span: 16 }}
+            />
           </Form>
         </Modal>
       </div>

@@ -9,6 +9,7 @@ import ToolUse from "../toolUse";
 import BookRecommend from "../bookRecommend";
 import DayConsume from '../dayConsume';
 import ClientInfo from '../clientInfo';
+import ActiveList from '../activeList';
 import request from "../../server/server.js";
 
 const SubMenu = Menu.SubMenu;
@@ -100,8 +101,8 @@ export default class Home extends Component {
                     <span>消费记录</span>
                   </Link>
                 </Menu.Item>
-                <Menu.Item key="/home/YBS/historyActive">
-                  <Link to="/home/YBS/historyActive">
+                <Menu.Item key="/home/YBS/activeList">
+                  <Link to="/home/YBS/activeList">
                     <span>优惠活动表</span>
                   </Link>
                 </Menu.Item>
@@ -132,6 +133,7 @@ export default class Home extends Component {
               <Route path="/home/bookRecommend" component={BookRecommend} />
               <Route path="/home/YBS/dayConsume" component={DayConsume} />
               <Route path="/home/YBS/clientInfo" component={ClientInfo} />
+              <Route path="/home/YBS/activeList" component={ActiveList} />
             </div>
           </div>
         </div>

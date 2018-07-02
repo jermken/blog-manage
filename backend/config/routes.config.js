@@ -12,5 +12,9 @@ module.exports = {
     '/api/loginup.json': '/api/loginup.json',
     '/api/article_list.json': '/api/article_list.json',
     '/api/add_article.json': '/api/add_article.json',
-    '/api/delete_article.json': '/api/delete_article.json'
+    '/api/delete_article.json': '/api/delete_article.json',
+    '/api/ybs_user.json': '/api/ybs_user.json',
+    '/api/ybs_add__user.json': '/api/ybs_add__user.json',
+    '/api/ybs_update__user.json': '/api/ybs_update__user.json',
+    '/api/ybs_delete__user.json': '/api/ybs_delete__user.json'
 }

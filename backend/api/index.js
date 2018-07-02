@@ -1,5 +1,5 @@
 const { noCheckHandler, getHandler, postHandler } = require("./util");
-const { User, Article } = require("../models/index");
+const { User, Article, EPSUser } = require("../models/index");
 const sha1 = require("sha1");
 const apiRouters = app => {
   // 登录接口
@@ -73,33 +73,41 @@ const apiRouters = app => {
   // 查询文章接口
   getHandler(app, "/api/article_list.json", (req, res) => {
     return Article.query(req.query).then(result => {
-      if(req.query.isEdit == 1) {
-          return result;
+      if (req.query.isEdit == 1) {
+        return result;
       }
       let resArray = [];
       let pageArray = [];
-      let {page, pageSize, label, title, author, begin_date, end_date} = req.query;
+      let {
+        page,
+        pageSize,
+        label,
+        title,
+        author,
+        begin_date,
+        end_date
+      } = req.query;
       let beginIndex = (page - 1) * pageSize;
-      let endIndex = (page-1)*pageSize+pageSize-1;
+      let endIndex = (page - 1) * pageSize + pageSize - 1;
       for (let i = 0, length = result.length; i < length; i++) {
         if (
           result[i].label.indexOf(label) > -1 &&
           result[i].title.indexOf(title) > -1 &&
-          result[i].author.indexOf(author) > -1 && 
+          result[i].author.indexOf(author) > -1 &&
           (begin_date <= result[i].time && end_date >= result[i].time)
         ) {
-            resArray.push(result[i]);
+          resArray.push(result[i]);
         }
       }
       let total = resArray.length;
-      for(let j = beginIndex, length = resArray.length; j < length; j++) {
-          if(j > endIndex) {
-              break;
-          } else {
-            pageArray.push(resArray[j]);
-          }
+      for (let j = beginIndex, length = resArray.length; j < length; j++) {
+        if (j > endIndex) {
+          break;
+        } else {
+          pageArray.push(resArray[j]);
+        }
       }
-      let resData = [pageArray,page,total];
+      let resData = [pageArray, page, total];
       return resData;
     });
   });
@@ -169,6 +177,104 @@ const apiRouters = app => {
         res.end();
       }
     });
+  });
+
+  // 依柏诗管理接口-------------------------------------
+  // 查询客户接口
+  getHandler(app, "/api/ybs_user.json", (req, res) => {
+    return EPSUser.query(req.query).then(result => {
+      let {
+        name,
+        startT,
+        endT,
+        vipCode,
+        booker,
+        sexual,
+        isVip,
+        page,
+        pageSize
+      } = req.query;
+      let beginIndex = (page - 1) * pageSize;
+      let endIndex = (page - 1) * pageSize + pageSize - 1;
+      let resArray = [];
+      let pageArray = [];
+      for (let i = 0, len = result.length; i < len; i++) {
+        if (
+          result[i].name.indexOf(name) > -1 &&
+          result[i].vipCode.indexOf(vipCode) > -1 &&
+          result[i].booker.indexOf(booker) > -1 &&
+          result[i].sexual.indexOf(sexual) > -1 &&
+          result[i].isVip.indexOf(isVip) > -1 &&
+          (startT <= result[i].creat_time && endT >= result[i].creat_time)
+        ) {
+          resArray.push(result[i]);
+        }
+      }
+      let total = resArray.length;
+      for (let j = beginIndex, length = resArray.length; j < length; j++) {
+        if (j > endIndex) {
+          break;
+        } else {
+          pageArray.push(resArray[j]);
+        }
+      }
+      let resData = [pageArray, page, total];
+      return resData;
+    });
+  });
+  // 增加客户接口
+  postHandler(app, "/api/ybs_add__user.json", (req, res) => {
+    return EPSUser.create(req.body)
+      .then(() => {
+        res.send({
+          code: 0,
+          msg: "新增成功！"
+        });
+        res.end();
+      })
+      .catch(() => {
+        res.send({
+          code: 100,
+          msg: "服务器异常！"
+        });
+        res.end();
+      });
+  });
+  // 编辑客户接口
+  postHandler(app, "/api/ybs_update__user.json", (req, res) => {
+    return EPSUser.update(req.body)
+      .then(() => {
+        res.send({
+          code: 0,
+          msg: "编辑成功！"
+        });
+        res.end();
+      })
+      .catch(() => {
+        res.send({
+          code: 100,
+          msg: "服务器异常！"
+        });
+        res.end();
+      });
+  });
+  // 删除客户接口
+  postHandler(app, "/api/ybs_delete__user.json", (req, res) => {
+    return EPSUser.delete(req.body)
+      .then(() => {
+        res.send({
+          code: 0,
+          msg: "删除成功！"
+        });
+        res.end();
+      })
+      .catch(() => {
+        res.send({
+          code: 100,
+          msg: "服务器异常！"
+        });
+        res.end();
+      });
   });
 };
 

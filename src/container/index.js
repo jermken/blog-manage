@@ -7,4 +7,5 @@ import ToolUse from './toolUse';
 import Write from './write';
 import DayConsume from './dayConsume';
 import ClientInfo from './clientInfo';
-export { Home, Login, BookRecommend, MyArticle, ToolUse, Write, LoginUp, DayConsume, ClientInfo };
+import ActiveList from './activeList';
+export { Home, Login, BookRecommend, MyArticle, ToolUse, Write, LoginUp, DayConsume, ClientInfo, ActiveList };

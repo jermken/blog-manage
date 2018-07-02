@@ -42,7 +42,7 @@ const xmlHttpReq = {
     reqPOST: (url, data, cb) => {
         let time = new Date();
         time = time.getTime();
-        url = publicPath + apiConfig[url] + '?_time_=' + time;
+        url = apiConfig[url] + '?_time_=' + time;
         fetch(url,{
             method: 'POST',
             body: JSON.stringify(data),
@@ -65,7 +65,7 @@ const xmlHttpReq = {
     reqGET: (url, data, cb) => {
         let time = new Date();
         time = time.getTime();
-        let URL = publicPath + apiConfig[url] + '?_time_=' + time + '&' + objectToStr(data);
+        let URL = apiConfig[url] + '?_time_=' + time + '&' + objectToStr(data);
         fetch(URL,{
             credentials: 'include'
         })
