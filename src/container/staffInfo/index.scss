@@ -1,0 +1,64 @@
+.staffInfo-page {
+    .form-area {
+        padding: 0 40px;
+    }
+    .staff-wrap {
+        .staff-list {
+            padding: 0 40px;
+            &:after {
+                content: '';
+                height: 0;
+                display: block;
+                clear: both;
+            }
+        }
+        .staff-item {
+            position: relative;
+            float: left;
+            width: 48%;
+            height: 180px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            margin-right: 4%;
+            margin-bottom: 30px;
+            padding: 20px;
+            box-sizing: border-box;
+            &:hover {
+                box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            }
+        }
+        .mrg-right-none {
+            margin-right: 0;
+        }
+        .staff-avatar {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+        }
+        .staff-info {
+            vertical-align: middle;
+            display: inline-block;
+            width: 300px;
+            color: #333;
+            font-size: 16px;
+            font-weight: bold;
+            .staff-name {
+                display: block;
+            }
+            .staff-concat {
+                display: block;
+            }
+            .staff-title {
+                color: #999;
+                font-size: 14px;
+                font-weight: normal;
+                margin: 0 15px;
+            }
+        }
+        .staff-btn-wrap {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+        }
+    }
+}

@@ -19,6 +19,16 @@ const ArticleSchema = new Schema('Aritcle', {
     content: {type: 'string'},
     time: {type: 'number'}
 })
+// 依柏诗店员列表
+const EPSStaffSchema = new Schema('EPSStaff', {
+    name: {type: 'string'},
+    creat_time: {type: 'number'},
+    update_time: {type: 'number'},
+    address: {type: 'string'},
+    contact: {type: 'string'},
+    birthday: {type: 'string'},
+    avatar: {type: 'string'}
+})
 // 依柏诗客户列表
 const EPSUserSchema = new Schema('EPSUser', {
     name: {type: 'string'},
@@ -91,5 +101,6 @@ exports.EPSRecharge = mongolass.model('EPSRecharge', EPSRechargeSchema)
 exports.EPSActive = mongolass.model('EPSActive', EPSActiveSchema)
 exports.EPSProject = mongolass.model('EPSProject', EPSProjectSchema)
 exports.EPSGoods = mongolass.model('EPSGoods', EPSGoodsSchema)
+exports.EPSStaff = mongolass.model('EPSStaff', EPSStaffSchema)
 //----- Model -----//
 

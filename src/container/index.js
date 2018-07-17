@@ -8,4 +8,5 @@ import Write from './write';
 import DayConsume from './dayConsume';
 import ClientInfo from './clientInfo';
 import ActiveList from './activeList';
-export { Home, Login, BookRecommend, MyArticle, ToolUse, Write, LoginUp, DayConsume, ClientInfo, ActiveList };
+import StaffInfo from './staffInfo';
+export { Home, Login, BookRecommend, MyArticle, ToolUse, Write, LoginUp, DayConsume, ClientInfo, ActiveList, StaffInfo };

@@ -10,8 +10,9 @@ import BookRecommend from "../bookRecommend";
 import DayConsume from '../dayConsume';
 import ClientInfo from '../clientInfo';
 import ActiveList from '../activeList';
+import StaffInfo from '../staffInfo';
 import request from "../../server/server.js";
-
+import MenuMap from './menuMap';
 const SubMenu = Menu.SubMenu;
 export default class Home extends Component {
   constructor(props) {
@@ -71,53 +72,32 @@ export default class Home extends Component {
               defaultSelectedKeys={that.state.defaultSelectedMenu}
               mode="inline"
             >
-              <Menu.Item key="/home/myArticle">
-                <Link to="/home/myArticle">
-                  <Icon type="file-markdown" />
-                  <span>我的文章</span>
-                </Link>
-              </Menu.Item>
-              <Menu.Item key="/home/write">
-                <Link to="/home/write">
-                  <Icon type="file-add" />
-                  <span>文章写作</span>
-                </Link>
-              </Menu.Item>
-              <Menu.Item key="/home/toolUse">
-                <Link to="/home/toolUse">
-                  <Icon type="tool" />
-                  <span>工具使用</span>
-                </Link>
-              </Menu.Item>
-              <Menu.Item key="/home/bookRecommend">
-                <Link to="/home/bookRecommend">
-                  <Icon type="book" />
-                  <span>书籍推荐</span>
-                </Link>
-              </Menu.Item>
-              <SubMenu key="/home/YBS" title={<span>依柏诗manage</span>}>
-                <Menu.Item key="/home/YBS/dayConsume">
-                  <Link to="/home/YBS/dayConsume">
-                    <span>消费记录</span>
-                  </Link>
-                </Menu.Item>
-                <Menu.Item key="/home/YBS/activeList">
-                  <Link to="/home/YBS/activeList">
-                    <span>优惠活动表</span>
-                  </Link>
-                </Menu.Item>
-                <Menu.Item key="/home/YBS/clientInfo">
-                  <Link to="/home/YBS/clientInfo">
-                    <span>客户信息</span>
-                  </Link>
-                </Menu.Item>
-                <Menu.Item key="/home/YBS/4">
-                  <span>库存管理</span>
-                </Menu.Item>
-                <Menu.Item key="/home/YBS/5">
-                  <span>员工信息</span>
-                </Menu.Item>
-              </SubMenu>
+            {
+              MenuMap.map((i) => {
+                if (i.isSubMenu) {
+                  return <SubMenu key={i.key} title={<span>{i.title}</span>}>
+                    {
+                      i.subMenu.map((j) => {
+                        return <Menu.Item key={j.key}>
+                          <Link to={j.link}>
+                            <span>{j.txt}</span>
+                          </Link>
+                        </Menu.Item>
+                      })
+                    }
+                  </SubMenu>
+                } else {
+                  return <Menu.Item key={i.key}>
+                          <Link to={i.link}>
+                          {
+                            i.icon? <Icon type={i.icon}/> : ''
+                          }
+                          <span>{i.txt}</span>
+                          </Link>
+                        </Menu.Item>
+                }
+              })
+            }
             </Menu>
           </div>
           <div className="main-right-body">
@@ -134,6 +114,7 @@ export default class Home extends Component {
               <Route path="/home/YBS/dayConsume" component={DayConsume} />
               <Route path="/home/YBS/clientInfo" component={ClientInfo} />
               <Route path="/home/YBS/activeList" component={ActiveList} />
+              <Route path="/home/YBS/staffInfo" component={StaffInfo} />
             </div>
           </div>
         </div>
