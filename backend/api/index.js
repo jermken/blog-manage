@@ -1,5 +1,8 @@
 const { noCheckHandler, getHandler, postHandler } = require("./util");
 const { User, Article, EPSUser } = require("../models/index");
+const formidable = require('formidable');
+const util = require('util');
+const path = require('path');
 const sha1 = require("sha1");
 const apiRouters = app => {
   // 登录接口
@@ -275,6 +278,22 @@ const apiRouters = app => {
         });
         res.end();
       });
+  });
+  // 图片上传接口
+  postHandler(app, "/api/ybs_upload.json", (req, res) => {
+    const form = new formidable.IncomingForm();
+    let files = [],fields = [];
+    form.encoding = 'utf-8';
+    form.uploadDir = path.join(__dirname,'../../tmp');
+    form.keepExtensions = true;
+    form.maxFieldsSize = 2*1024*1024;
+    form.parse(req, function(err, fields, files) {
+      res.send({
+        code: 0,
+        data: files.staffPhotos.path
+      });
+      res.end();
+    })
   });
 };
 
