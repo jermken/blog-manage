@@ -1,7 +1,9 @@
 import React, { Component } from "react";
-import { Button, Popconfirm, Pagination, Form, Row, Col, Radio, Modal, Input, DatePicker, Upload, Icon  } from 'antd';
+import { Button, Popconfirm, Pagination, Form, Row, Col, Radio, Modal, Input, DatePicker, Upload, Icon, message  } from 'antd';
 import moment from 'moment';
+import request from "../../server/server";
 import './index.scss';
+import defaultAvatar from '../../asset/image/default_avatar.png';
 
 const uploadButton = (
     <div>
@@ -15,21 +17,21 @@ export default class StaffInfo extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            dataList:[1,2,3,4,5,6],
+            dataList:[],
             queryParams: {
                 name: '',
                 status: 1,
                 page: 1,
                 pageSize: 6
             },
-            total: 7,
+            total: 0,
             pageSize: 6,
             detailVisble: false,
             detail:{
                 status: 1,
                 name: '',
                 address: '',
-                concat: '',
+                contact: '',
                 birthday: '2000-01-01',
                 fileList: []
             },
@@ -39,50 +41,71 @@ export default class StaffInfo extends Component {
             validate:{
                 name: {},
                 address: {},
-                concat: {},
+                contact: {},
                 birthday: {}
             }
         }
     }
     componentWillMount() {
-        this.fetchData();
+        this.fetchData(this.state.queryParams);
     }
-    fetchData() {
-    
+    fetchData(queryParams) {
+        queryParams = queryParams || this.state.queryParams;
+        request.reqGET('epsStaffList', {...queryParams}, (res) => {
+            if(!res.code) {
+                let items = res.data[0];
+                for(let i = 0, len = items.length; i < len; i++) {
+                    items[i].fileList = JSON.parse(items[i].fileList);
+                }
+                this.setState({
+                    dataList: items,
+                    total: res.data[2],
+                    queryParams
+                });
+            } else {
+                message.error('服务器异常，请稍后重试');
+            }
+        });
     }
-    deleteStaff = () => {
-        console.log('删除员工');
-        this.fetchData();
+    deleteStaff = (id) => {
+        request.reqPOST('epsDeleteStaff', {_id: id}, (res) => {
+            if(!res.code) {
+                message.success('删除成功');
+                this.fetchData(this.state.queryParams);
+            } else {
+                message.error('删除失败，请稍后重试');
+            }
+        })
     }
     pageChange = (page, pageSize) => {
         let { queryParams } = this.state;
         queryParams.page = page;
         queryParams.pageSize = pageSize;
-        this.setState({
-            queryParams
-        });
-        this.fetchData();
+        this.fetchData(queryParams);
     }
     isOffChange = (e) => {
         let { queryParams } = this.state;
         queryParams.status = e.target.value;
-        this.setState({
-            queryParams
-        });
-        this.fetchData();
+        this.fetchData(queryParams);
     }
-    addStaff = () => {
-        let detail = {
-            status: 1,
-            name: '',
-            address: '',
-            concat: '',
-            birthday: '2000-01-01',
-            fileList: []
+    manageStaff = (i) => {
+        let detail;
+        if (i) {
+            detail = i;
+        } else {
+            detail = {
+                status: 1,
+                name: '',
+                address: '',
+                contact: '',
+                birthday: '2000-01-01',
+                fileList: []
+            }
         }
         this.setState({
             detailVisble: true,
-            detail
+            detail,
+            fileList: i ? i.fileList : []
         })
     }
     checkEditInfo = () => {
@@ -96,13 +119,13 @@ export default class StaffInfo extends Component {
             validate.name.error = false;
             validate.name.help = '';
         }
-        if (!/(^1[3|4|5|7|8]\d{9}$)|(^09\d{8}$)/.test(detail.concat)) {
-            validate.concat.error = true;
-            validate.concat.help = '请填写联系方式';
+        if (!/(^1[3|4|5|7|8]\d{9}$)|(^09\d{8}$)/.test(detail.contact)) {
+            validate.contact.error = true;
+            validate.contact.help = '联系方式格式有误';
             isvalidate = false;
         } else {
-            validate.concat.error = false;
-            validate.concat.help = '';
+            validate.contact.error = false;
+            validate.contact.help = '';
         }
         if (detail.address === '') {
             validate.address.error = true;
@@ -114,7 +137,7 @@ export default class StaffInfo extends Component {
         }
         if (detail.birthday === '') {
             validate.birthday.error = true;
-            validate.birthday.help = '请选择生日';
+            validate.birthday.help = '请选择或填写生日，格式：2000-01-01';
             isvalidate = false;
         } else {
             validate.birthday.error = false;
@@ -127,9 +150,35 @@ export default class StaffInfo extends Component {
     }
     handleEdit = () => {
         if(this.checkEditInfo()) {
-            this.setState({
-                detailVisble: false
-            });
+            let { detail } = this.state;
+            detail.fileList = JSON.stringify(detail.fileList);
+            if (detail._id) {
+                detail.update_time = +new Date();
+                request.reqPOST('epsUpdateStaff', {...detail}, (res) => {
+                    if (!res.code) {
+                        this.setState({
+                            detailVisble: false
+                        });
+                        this.fetchData();
+                        message.success('修改成功');
+                    } else {
+                        message.error(res.msg);
+                    }
+                })
+            } else {
+                detail.create_time = detail.update_time = +new Date();
+                request.reqPOST('epsAddStaff', {...detail}, (res) => {
+                    if (!res.code) {
+                        this.setState({
+                            detailVisble: false
+                        });
+                        this.fetchData();
+                        message.success('新增成功');
+                    } else {
+                        message.error(res.msg);
+                    }
+                })
+            }
         }
     }
     editCancel = () => {
@@ -143,7 +192,7 @@ export default class StaffInfo extends Component {
         detail[type] = e.target.value;
         this.setState({
             detail
-        })
+        });
     }
     isEditOffChange = (e) => {
         let { detail } = this.state;
@@ -212,7 +261,7 @@ export default class StaffInfo extends Component {
                             </Form.Item>
                         </Col>
                         <Col span={12}>
-                            <Button type="primary" onClick={this.addStaff} style={{'float': 'right'}}>新增</Button>
+                            <Button type="primary" onClick={() => {this.manageStaff()}} style={{'float': 'right'}}>新增</Button>
                         </Col>
                     </Row>
                 </Form>
@@ -221,17 +270,17 @@ export default class StaffInfo extends Component {
                 <ul className="staff-list">
                     {
                         dataList.map((i,idx) => {
-                            return <li className={`staff-item ${(idx+1)%2? '' : 'mrg-right-none'}`} key={idx}>
-                                <img className="staff-avatar" src="http://downhdlogo.yy.com/hdlogo/6060/60/60/50/1346502044/u13465020444G8ndtm.jpg"/>
+                            return <li className={`staff-item ${(idx+1)%2? '' : 'mrg-right-none'} ${i.status == 2 ? 'offline' : ''}`} key={idx}>
+                                <img className="staff-avatar" src={i.fileList.length? i.fileList[0].url : defaultAvatar}/>
                                 <span className="staff-info">
-                                    <span className="staff-name"><span className="staff-title">姓名:</span>小宝</span>
-                                    <span className="staff-concat"><span className="staff-title">联系方式:</span>13231242344</span>
+                                    <span className="staff-name"><span className="staff-title">姓名:</span>{i.name}</span>
+                                    <span className="staff-contact"><span className="staff-title">联系方式:</span>{i.contact}</span>
                                 </span>
                                 <span className="staff-btn-wrap">
-                                    <Popconfirm placement="top" title="确定删除此位员工？" cancelText="取消" okText="确定" onConfirm={this.deleteStaff}>
+                                    <Popconfirm placement="top" title="确定删除此位员工？" cancelText="取消" okText="确定" onConfirm={() => {this.deleteStaff(i._id)}}>
                                         <Button type="danger" ghost style={{'marginRight': '10px'}}>删除</Button>
                                     </Popconfirm>
-                                    <Button type="primary" ghost>管理</Button>
+                                    <Button type="primary" ghost onClick={() => {this.manageStaff(i)}}>管理</Button>
                                 </span>
                             </li>
                         })
@@ -239,7 +288,7 @@ export default class StaffInfo extends Component {
                 </ul>
             </div>
             <div className="pagination-wrap">
-                <Pagination style={{ margin: "0 auto" }} total={total} onChange={this.pageChange} pageSize={pageSize}></Pagination>
+            {total? <Pagination style={{ margin: "0 auto" }} total={total} onChange={this.pageChange} pageSize={pageSize}></Pagination> : null}
             </div>
             <Modal
                 title="员工信息"
@@ -252,10 +301,10 @@ export default class StaffInfo extends Component {
             >
             <Form>
                 <Form.Item label="姓名" required labelCol={{ span: 4 }} wrapperCol={{ span: 10 }} help={validate.name.help} validateStatus={validate.name.error? 'error' : ''}>
-                    <Input value={detail.name} placeholder="请输入姓名" onChange={this.detailIptChange} data-symbol="name"/>
+                    <Input value={detail.name} placeholder="请输入姓名" onChange={this.detailIptChange.bind(this)} data-symbol="name"/>
                 </Form.Item>
-                <Form.Item required label="联系方式" labelCol={{ span: 4 }} wrapperCol={{ span: 10 }} help={validate.concat.help} validateStatus={validate.concat.error? 'error' : ''}>
-                    <Input value={detail.concat} placeholder="请输入手机号" data-symbol="concat" onChange={this.detailIptChange}/>
+                <Form.Item required label="联系方式" labelCol={{ span: 4 }} wrapperCol={{ span: 10 }} help={validate.contact.help} validateStatus={validate.contact.error? 'error' : ''}>
+                    <Input value={detail.contact} placeholder="请输入手机号" data-symbol="contact" onChange={this.detailIptChange}/>
                 </Form.Item>
                 <Form.Item required label="地址" labelCol={{ span: 4 }} wrapperCol={{ span: 10 }} help={validate.address.help} validateStatus={validate.address.error? 'error' : ''}>
                     <Input value={detail.address} placeholder="请输入地址" data-symbol="address" onChange={this.detailIptChange}/>
@@ -277,7 +326,7 @@ export default class StaffInfo extends Component {
                         onPreview={this.handlePreview}
                         onChange={this.upLoadChange}
                         onRemove={this.removePhotos}
-                        name="staffPhotos"
+                        name="uploadPhotos"
                     >
                     {fileList.length > 0 ? null : uploadButton}
                     </Upload>

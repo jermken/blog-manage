@@ -4,13 +4,14 @@ module.exports = {
     create: function(data) {
         return EPSStaff.insertOne(data).exec()
     },
-    delete: function(id) {
-        return EPSStaff.remove({_id: id}).exec()
+    delete: function(data) {
+        return EPSStaff.remove({_id: data._id}).exec()
     },
     update: function(data) {
-        return EPSStaff.update({_id: data._id}, {$set: {data}}).exec()
+        return EPSStaff.update({_id: data._id}, {$set: data}).exec()
     },
     query: function(data) {
-        return EPSStaff.findOne({name: data.name}).exec();
+        let params = data.name ? {name: data.name} : {};
+        return EPSStaff.find(params).exec();
     }
 }

@@ -23,6 +23,9 @@
             margin-bottom: 30px;
             padding: 20px;
             box-sizing: border-box;
+            &.offline {
+                background: #999;
+            }
             &:hover {
                 box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
             }
@@ -45,7 +48,7 @@
             .staff-name {
                 display: block;
             }
-            .staff-concat {
+            .staff-contact {
                 display: block;
             }
             .staff-title {

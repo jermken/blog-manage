@@ -85,3 +85,15 @@ li {
 .am-list-content {
   font-size: 16px !important;
 }
+
+.clear-float {
+    &:after {
+        content: '';
+        height: 0;
+        display: block;
+        clear: both;
+    }
+}
+.wran {
+    color: red;
+}

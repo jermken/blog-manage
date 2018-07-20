@@ -9,4 +9,5 @@ import DayConsume from './dayConsume';
 import ClientInfo from './clientInfo';
 import ActiveList from './activeList';
 import StaffInfo from './staffInfo';
-export { Home, Login, BookRecommend, MyArticle, ToolUse, Write, LoginUp, DayConsume, ClientInfo, ActiveList, StaffInfo };
+import StockManage from './stockManage';
+export { Home, Login, BookRecommend, MyArticle, ToolUse, Write, LoginUp, DayConsume, ClientInfo, ActiveList, StaffInfo, StockManage };

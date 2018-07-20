@@ -1,5 +1,5 @@
 const { noCheckHandler, getHandler, postHandler } = require("./util");
-const { User, Article, EPSUser } = require("../models/index");
+const { User, Article, EPSUser, EPSStaff, EPSGoods, EPSStockLog } = require("../models/index");
 const formidable = require('formidable');
 const util = require('util');
 const path = require('path');
@@ -290,10 +290,255 @@ const apiRouters = app => {
     form.parse(req, function(err, fields, files) {
       res.send({
         code: 0,
-        data: files.staffPhotos.path
+        data: files.uploadPhotos.path
       });
       res.end();
     })
+  });
+  // 查询员工接口
+  getHandler(app, "/api/ybs_staff.json", (req, res) => {
+    return EPSStaff.query(req.query).then(result => {
+      let resData = [[], 1, 0];
+      if(result) {
+        let {
+          status,
+          page,
+          pageSize
+        } = req.query;
+        let beginIndex = (page - 1) * pageSize;
+        let endIndex = (page - 1) * pageSize + pageSize - 1;
+        let resArray = [];
+        let pageArray = [];
+        if (status == 0) {
+          resArray = [...result];
+        } else {
+          for (let i = 0, len = result.length; i < len; i++) {
+            if (result[i].status == status) {
+              resArray.push(result[i]);
+            }
+          }
+        }
+        let total = resArray.length;
+        for (let j = beginIndex, length = resArray.length; j < length; j++) {
+          if (j > endIndex) {
+            break;
+          } else {
+            pageArray.push(resArray[j]);
+          }
+        }
+        resData = [pageArray, page, total];
+      }
+      return resData;
+    });
+  });
+  // 增加员工接口
+  postHandler(app, "/api/ybs_add_staff.json", (req, res) => {
+    return EPSStaff.query({name: req.body.name}).then((result) => {
+      if(!result) {
+        return EPSStaff.create(req.body)
+        .then(() => {
+          res.send({
+            code: 0,
+            msg: "新增成功！"
+          });
+          res.end();
+        })
+        .catch(() => {
+          res.send({
+            code: 100,
+            msg: "服务器异常！"
+          });
+          res.end();
+        });
+      } else {
+        res.send({
+          code: 100,
+          msg: "该员工已存在！"
+        });
+        res.end();
+      }
+    });
+  });
+  // 删除员工接口
+  postHandler(app, "/api/ybs_delete_staff.json", (req, res) => {
+    return EPSStaff.delete(req.body)
+      .then(() => {
+        res.send({
+          code: 0,
+          msg: "删除成功！"
+        });
+        res.end();
+      })
+      .catch(() => {
+        res.send({
+          code: 100,
+          msg: "服务器异常！"
+        });
+        res.end();
+      });
+  });
+  // 编辑员工接口
+  postHandler(app, "/api/ybs_update_staff.json", (req, res) => {
+    return EPSStaff.update(req.body)
+      .then(() => {
+        res.send({
+          code: 0,
+          msg: "编辑成功！"
+        });
+        res.end();
+      })
+      .catch(() => {
+        res.send({
+          code: 100,
+          msg: "服务器异常！"
+        });
+        res.end();
+      });
+  });
+
+  // 查询产品接口
+  getHandler(app, "/api/ybs_goods.json", (req, res) => {
+    return EPSGoods.query({}).then(result => {
+      let resData = [[], 1, 0];
+      if(result) {
+        let {
+          title,
+          code,
+          page,
+          pageSize
+        } = req.query;
+        let beginIndex = (page - 1) * pageSize;
+        let endIndex = (page - 1) * pageSize + pageSize - 1;
+        let resArray = [];
+        let pageArray = [];
+        for (let i = 0, len = result.length; i < len; i++) {
+          if (result[i].title.indexOf(title) > -1 && result[i].code.indexOf(code) > -1) {
+            resArray.push(result[i]);
+          }
+        }
+        let total = resArray.length;
+        for (let j = beginIndex, length = resArray.length; j < length; j++) {
+          if (j > endIndex) {
+            break;
+          } else {
+            pageArray.push(resArray[j]);
+          }
+        }
+        resData = [pageArray, page, total];
+      }
+      return resData;
+    });
+  });
+  // 增加产品接口
+  postHandler(app, "/api/ybs_add_goods.json", (req, res) => {
+    req.body.joinStock = '';
+    return EPSGoods.query({title: req.body.title}).then((result) => {
+      if(Object.prototype.toString.call(result) === '[object Array]' && result.length) {
+        res.send({
+          code: 100,
+          msg: "该产品已存在！"
+        });
+        res.end();
+      } else {
+        return EPSGoods.create(req.body)
+        .then(() => {
+          res.send({
+            code: 0,
+            msg: "新增成功！"
+          });
+          res.end();
+        })
+        .catch(() => {
+          res.send({
+            code: 100,
+            msg: "服务器异常！"
+          });
+          res.end();
+        });
+      }
+    });
+  });
+  // 删除产品接口
+  postHandler(app, "/api/ybs_delete_goods.json", (req, res) => {
+    return EPSGoods.delete(req.body)
+      .then(() => {
+        res.send({
+          code: 0,
+          msg: "删除成功！"
+        });
+        res.end();
+      })
+      .catch(() => {
+        res.send({
+          code: 100,
+          msg: "服务器异常！"
+        });
+        res.end();
+      });
+  });
+  // 编辑产品接口
+  postHandler(app, "/api/ybs_update_goods.json", (req, res) => {
+    req.body.joinStock = '';
+    return EPSGoods.update(req.body)
+      .then(() => {
+        res.send({
+          code: 0,
+          msg: "编辑成功！"
+        });
+        res.end();
+      })
+      .catch(() => {
+        res.send({
+          code: 100,
+          msg: "服务器异常！"
+        });
+        res.end();
+      });
+  });
+  // 增加入库记录接口
+  postHandler(app, "/api/ybs_add_stocklog.json", (req, res) => {
+    return EPSStockLog.query({title: req.body.title}).then((result) => {
+      if(Object.prototype.toString.call(result) === '[object Array]' && result.length) {
+        let obj = result[0];
+        let arr = JSON.parse(obj.joinStock);
+        arr.push(req.body.joinStock);
+        obj.joinStock = JSON.stringify(arr);
+        return EPSStockLog.update(obj)
+        .then(() => {
+          res.send({
+            code: 0,
+            msg: "成功！"
+          });
+          res.end();
+        })
+        .catch(() => {
+          res.send({
+            code: 100,
+            msg: "服务器异常！"
+          });
+          res.end();
+        });
+      } else {
+        let obj = {};
+        obj.title = req.body.title;
+        obj.joinStock = JSON.stringify([req.body.joinStock]);
+        return EPSStockLog.create(obj)
+        .then(() => {
+          res.send({
+            code: 0,
+            msg: "成功！"
+          });
+          res.end();
+        })
+        .catch(() => {
+          res.send({
+            code: 100,
+            msg: "服务器异常！"
+          });
+          res.end();
+        });
+      }
+    });
   });
 };
 

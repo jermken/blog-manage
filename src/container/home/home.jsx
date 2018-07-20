@@ -11,6 +11,7 @@ import DayConsume from '../dayConsume';
 import ClientInfo from '../clientInfo';
 import ActiveList from '../activeList';
 import StaffInfo from '../staffInfo';
+import StockManage from '../stockManage';
 import request from "../../server/server.js";
 import MenuMap from './menuMap';
 const SubMenu = Menu.SubMenu;
@@ -115,6 +116,7 @@ export default class Home extends Component {
               <Route path="/home/YBS/clientInfo" component={ClientInfo} />
               <Route path="/home/YBS/activeList" component={ActiveList} />
               <Route path="/home/YBS/staffInfo" component={StaffInfo} />
+              <Route path="/home/YBS/stockManage" component={StockManage} />
             </div>
           </div>
         </div>

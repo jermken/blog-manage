@@ -1,0 +1,55 @@
+.stockInfo-page {
+    .goods-list {
+        margin-left: -20px;
+        padding: 20px 20px 0;
+        overflow: hidden;
+        min-width: 1430px;
+    }
+    .goods-item {
+        float: left;
+        padding: 20px;
+        border-radius: 4px;
+        border: 2px solid #ccc;
+        margin-left: 20px;
+        margin-bottom: 20px;
+        width: 18%;
+        &:hover {
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+        .goods-img {
+            display: block;
+            margin: 0 auto;
+            width: 150px;
+            height: 150px;
+        }
+        .goods-info {
+            font-size: 16px;
+            line-height: 28px;
+            margin-top: 20px;
+            .goods-name {
+                color: #333;
+            }
+            .goods-code {
+                color: #999;
+            }
+            .goods-stock {
+                color: #1890ff;
+            }
+        }
+        .goods-operation {
+            display: flex;
+            margin-top: 20px;
+            .goods-btn {
+                flex: 1;
+                margin-right: 10px;
+                &:last-child {
+                    margin-right: 0;
+                }
+            }
+        }
+        .goods-title {
+            color: #333;
+            margin-right: 20px;
+        }
+    }
+}

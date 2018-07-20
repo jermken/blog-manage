@@ -22,17 +22,18 @@ const ArticleSchema = new Schema('Aritcle', {
 // 依柏诗店员列表
 const EPSStaffSchema = new Schema('EPSStaff', {
     name: {type: 'string'},
-    creat_time: {type: 'number'},
+    create_time: {type: 'number'},
     update_time: {type: 'number'},
     address: {type: 'string'},
     contact: {type: 'string'},
     birthday: {type: 'string'},
-    avatar: {type: 'string'}
+    fileList: {type: 'string',default: '[]'},
+    status: {type: 'number'}
 })
 // 依柏诗客户列表
 const EPSUserSchema = new Schema('EPSUser', {
     name: {type: 'string'},
-    creat_time: {type: 'number'},
+    create_time: {type: 'number'},
     update_time: {type: 'number'},
     isVip: {type: 'boolean'},
     vipCode: {type: 'string'},
@@ -65,7 +66,7 @@ const EPSRechargeSchema = new Schema('EPSRecharge', {
 // 依柏诗活动列表
 const EPSActiveSchema = new Schema('EPSActive', {
     name: {type: 'string'},
-    creat_time: {type: 'number'},
+    create_time: {type: 'number'},
     update_time: {type: 'number'},
     start_time: {type: 'string'},
     end_time: {type: 'string'},
@@ -83,12 +84,22 @@ const EPSProjectSchema = new Schema('EPSProject', {
 })
 // 依柏诗产品列表
 const EPSGoodsSchema = new Schema('EPSGoods', {
-    name: {type: 'string'},
-    creat_time: {type: 'number'},
+    title: {type: 'string'},
+    create_time: {type: 'number'},
+    price: {type: 'string'},
+    warnNum: {type: 'string'},
     code: {type: 'string'},
     update_time: {type: 'number'},
-    creator: {type: 'string'},
-    desc: {type: 'string'}
+    joinStock: {type: 'string'},
+    stock: {type: 'number'},
+    desc: {type: 'string'},
+    fileList: {type: 'string'}
+})
+
+// 依柏诗产品列表
+const EPSStockLogSchema = new Schema('EPSStockLog', {
+    title: {type: 'string'},
+    joinStock: {type: 'string'}
 })
 //----- Schema -----//
 
@@ -102,5 +113,6 @@ exports.EPSActive = mongolass.model('EPSActive', EPSActiveSchema)
 exports.EPSProject = mongolass.model('EPSProject', EPSProjectSchema)
 exports.EPSGoods = mongolass.model('EPSGoods', EPSGoodsSchema)
 exports.EPSStaff = mongolass.model('EPSStaff', EPSStaffSchema)
+exports.EPSStockLog = mongolass.model('EPSStockLog', EPSStockLogSchema)
 //----- Model -----//
 
