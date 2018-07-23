@@ -63,18 +63,7 @@ const EPSRechargeSchema = new Schema('EPSRecharge', {
     serverName: {type: 'string'},
     desc: {type: 'string'}
 })
-// 依柏诗活动列表
-const EPSActiveSchema = new Schema('EPSActive', {
-    name: {type: 'string'},
-    create_time: {type: 'number'},
-    update_time: {type: 'number'},
-    start_time: {type: 'string'},
-    end_time: {type: 'string'},
-    creator: {type: 'string'},
-    projectList: {type: 'array'},
-    clientList: {type: 'array'},
-    desc: {type: 'string'}
-})
+
 // 依柏诗项目列表
 const EPSProjectSchema = new Schema('EPSProject', {
     name: {type: 'string'},
@@ -96,10 +85,21 @@ const EPSGoodsSchema = new Schema('EPSGoods', {
     fileList: {type: 'string'}
 })
 
-// 依柏诗产品列表
+// 依柏诗产品入库记录
 const EPSStockLogSchema = new Schema('EPSStockLog', {
     title: {type: 'string'},
     joinStock: {type: 'string'}
+})
+
+// 依柏诗活动列表
+const EPSActiveListSchema = new Schema('EPSActiveList', {
+    title: {type: 'string'},
+    create_time: {type: 'number'},
+    update_time: {type: 'number'},
+    creator: {type: 'string'},
+    begin_time: {type: 'number'},
+    end_time: {type: 'number'},
+    list: {type: 'string'}
 })
 //----- Schema -----//
 
@@ -114,5 +114,6 @@ exports.EPSProject = mongolass.model('EPSProject', EPSProjectSchema)
 exports.EPSGoods = mongolass.model('EPSGoods', EPSGoodsSchema)
 exports.EPSStaff = mongolass.model('EPSStaff', EPSStaffSchema)
 exports.EPSStockLog = mongolass.model('EPSStockLog', EPSStockLogSchema)
+exports.EPSActiveList = mongolass.model('EPSActiveList', EPSActiveListSchema)
 //----- Model -----//
 

@@ -19,7 +19,11 @@ const apiConfig = {
     epsAddGoods: '/api/ybs_add_goods.json', // 新增产品
     epsUpdateGoods: '/api/ybs_update_goods.json', // 编辑产品
     epsDeleteGoods: '/api/ybs_delete_goods.json', // 删除产品
-    epsAddStockLog: '/api/ybs_add_stocklog.json'
+    epsAddStockLog: '/api/ybs_add_stocklog.json', // 增加入库日志
+    epsAddActive: '/api/ybs_add_active.json', // 增加活动
+    epsActive: '/api/ybs_active.json', // 活动列表
+    epsUpdateActive: '/api/ybs_update_active.json', // 编辑活动
+    epsDeleteActive: '/api/ybs_delete_active.json', // 删除活动
 }
 
 export default apiConfig;

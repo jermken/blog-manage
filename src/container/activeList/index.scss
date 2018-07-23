@@ -1,0 +1,51 @@
+.active-wrap {
+    .active-list {
+        margin-left: -3.33%;
+    }
+    .active-item {
+        position: relative;
+        float: left;
+        width: 30%;
+        margin-left: 3.33%;
+        margin-bottom: 20px;
+        border-radius: 6px;
+        height: 230px;
+        background-color: #000;
+        background-image: url('../../asset/image/eps_active_card.png');
+        background-position: center;
+        background-repeat: no-repeat;
+        &:hover {
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+        color: #fff;
+        .active-title {
+            position: absolute;
+            display: block;
+            top: 0;
+            left: 0;
+            border-top-left-radius: 6px;
+            border-bottom-right-radius: 6px;
+            background-color: #d1aa73;
+            text-align: center;
+            height: 32px;
+            line-height: 32px;
+            padding: 0 16px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .active-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            font-size: 16px;
+            padding-left: 16px;
+        }
+        .active-operation {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            text-align: right;
+            padding: 0 16px 16px 0;
+        }
+    }
+}

@@ -10,6 +10,7 @@ module.exports = {
     '/home/bookRecommend': '/home/bookRecommend',
     '/home/YBS/staffInfo': '/home/YBS/staffInfo',
     '/home/YBS/stockManage': '/home/YBS/stockManage',
+    '/home/YBS/active': '/home/YBS/active',
     '/api/login.json': '/api/login.json',
     '/api/loginup.json': '/api/loginup.json',
     '/api/article_list.json': '/api/article_list.json',
@@ -28,6 +29,10 @@ module.exports = {
     '/api/ybs_add_goods.json': '/api/ybs_add_goods.json',
     '/api/ybs_update_goods.json': '/api/ybs_update_goods.json',
     '/api/ybs_delete_goods.json': '/api/ybs_delete_goods.json',
-    '/api/ybs_add_stocklog.json': '/api/ybs_add_stocklog.json'
+    '/api/ybs_add_stocklog.json': '/api/ybs_add_stocklog.json',
+    '/api/ybs_add_active.json': '/api/ybs_add_active.json',
+    '/api/ybs_active.json': '/api/ybs_active.json',
+    '/api/ybs_update_active.json': '/api/ybs_update_active.json',
+    '/api/ybs_delete_active.json': '/api/ybs_delete_active.json',
 
 }
