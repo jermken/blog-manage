@@ -114,7 +114,7 @@ export default class Home extends Component {
               <Route path="/home/bookRecommend" component={BookRecommend} />
               <Route path="/home/YBS/dayConsume" component={DayConsume} />
               <Route path="/home/YBS/clientInfo" component={ClientInfo} />
-              <Route path="/home/YBS/activeList" component={ActiveList} />
+              <Route path="/home/YBS/active" component={ActiveList} />
               <Route path="/home/YBS/staffInfo" component={StaffInfo} />
               <Route path="/home/YBS/stockManage" component={StockManage} />
             </div>

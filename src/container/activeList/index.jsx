@@ -20,7 +20,7 @@ export default class ActiveList extends Component {
                 begin_time: '',
                 end_time: '',
                 page: 1,
-                pageSize: 10
+                pageSize: 9
             },
             total: 0,
             detailVisble: false,
@@ -46,21 +46,17 @@ export default class ActiveList extends Component {
     }
     fetchData(queryParams) {
         queryParams = queryParams || this.state.queryParams;
-        this.setState({
-          queryParams
-        })
-        console.log(queryParams, '查询数据参数');
-        // request.reqGET('epsActive', {...queryParams}, (res) => {
-        //     if(!res.code) {
-        //         this.setState({
-        //             dataList: res.data[0],
-        //             total: res.data[2],
-        //             queryParams
-        //         });
-        //     } else {
-        //         message.error('服务器异常，请稍后重试');
-        //     }
-        // });
+        request.reqGET('epsActive', {...queryParams}, (res) => {
+            if(!res.code) {
+                this.setState({
+                    dataList: res.data[0],
+                    total: res.data[2],
+                    queryParams
+                });
+            } else {
+                message.error('服务器异常，请稍后重试');
+            }
+        });
     }
     deleteActive = (id) => {
         request.reqPOST('epsDeleteActive', {_id: id}, (res) => {
@@ -165,39 +161,32 @@ export default class ActiveList extends Component {
     handleEdit = () => {
         if(this.checkEditInfo()) {
             let { detail } = this.state;
-            detail.fileList = JSON.stringify(detail.fileList);
+            delete(detail.validate);
+            detail.creator = localStorage.getItem('author');
             if (detail._id) {
                 detail.update_time = +new Date();
-                detail.stock = detail.stock + Number(detail.joinStock);
-                request.reqPOST('epsUpdateGoods', {...detail}, (res) => {
+                request.reqPOST('epsUpdateActive', {...detail}, (res) => {
                     if (!res.code) {
                         this.setState({
                             detailVisble: false
                         });
                         this.fetchData();
                         message.success('修改成功');
-                        if (Number(detail.joinStock)) {
-                            request.reqPOST('epsAddStockLog', {title: detail.title,joinStock:{num:detail.joinStock,date: +new Date()}});
-                        }
                     } else {
-                        message.error('修改失败，请稍后重试');
+                        message.error(res.msg);
                     }
                 })
             } else {
                 detail.create_time = detail.update_time = +new Date();
-                detail.stock = detail.stock + Number(detail.joinStock);
-                request.reqPOST('epsAddGoods', {...detail}, (res) => {
+                request.reqPOST('epsAddActive', {...detail}, (res) => {
                     if (!res.code) {
                         this.setState({
                             detailVisble: false
                         });
                         this.fetchData();
-                        if (Number(detail.joinStock)) {
-                            request.reqPOST('epsAddStockLog', {title: detail.title,joinStock:{num:detail.joinStock,date: +new Date()}});
-                        }
                         message.success('新增成功');
                     } else {
-                        message.error('新增失败，请稍后重试');
+                        message.error(res.msg);
                     }
                 })
             }
@@ -248,9 +237,6 @@ export default class ActiveList extends Component {
       queryParams.end_time = +new Date(dataStr[1]);
       this.fetchData(queryParams);
     }
-    projectChange = (val) => {
-      console.log(val);
-    }
     projectInfoChange = (e,idx,type) => {
       let { detail } = this.state;
       detail.list[idx][type] = e.target.value;
@@ -270,7 +256,7 @@ export default class ActiveList extends Component {
       })
     }
     render() {
-        let { dataList, total, pageSize, queryParams, detailVisble, detail, validate } = this.state;
+        let { dataList, total, queryParams, detailVisble, detail, validate } = this.state;
         return <div className="active-page">
             <div className="form-area">
                 <Form>
@@ -309,9 +295,9 @@ export default class ActiveList extends Component {
                 <ul className="active-list clear-float">
                 {dataList.map((i,idx) => {
                   return <li className="active-item" key={idx}> 
-                    <span className="active-title">活动1活动1</span>
+                    <span className="active-title">{i.title}</span>
                     <div className="active-info">
-                      <p className="active-date">有效期：2018-01-01 至 2018-09-09</p>
+                      <p className="active-date">有效期：{i.begin_time} 至 {i.end_time}</p>
                     </div>
                     <div className="active-operation">
                     <Popconfirm placement="top" title="确定删除该活动？" cancelText="取消" okText="确定" onConfirm={() => {this.deleteActive(i._id)}}>
@@ -323,8 +309,8 @@ export default class ActiveList extends Component {
                 })}
                 </ul>
             </div>
-            <div className="pagination-wrap" style={{marginTop: '-10px'}}>
-            {total? <Pagination style={{ margin: "0 auto" }} total={total} onChange={this.pageChange} pageSize={pageSize}></Pagination> : null}
+            <div className="pagination-wrap">
+            {total? <Pagination style={{ margin: "0 auto" }} total={total} onChange={this.pageChange} pageSize={queryParams.pageSize}></Pagination> : null}
             </div>
             <Modal
                 title="活动详情"
@@ -355,7 +341,7 @@ export default class ActiveList extends Component {
                   })}
                 </Form.Item>
                 <Form.Item label="活动备注" labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
-                    <TextArea rows={3} data-symbol="desc" onChange={this.detailIptChange}/>
+                    <TextArea value={detail.desc} rows={3} data-symbol="desc" onChange={this.detailIptChange}/>
                 </Form.Item>
             </Form>
             </Modal>

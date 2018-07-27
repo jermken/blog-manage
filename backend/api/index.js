@@ -6,7 +6,7 @@ const {
   EPSStaff,
   EPSGoods,
   EPSStockLog,
-  EPSActiveList
+  EPSActive
 } = require("../models/index");
 const formidable = require("formidable");
 const util = require("util");
@@ -484,22 +484,32 @@ const apiRouters = app => {
   });
   // 编辑产品接口
   postHandler(app, "/api/ybs_update_goods.json", (req, res) => {
-    req.body.joinStock = "";
-    return EPSGoods.update(req.body)
-      .then(() => {
-        res.send({
-          code: 0,
-          msg: "编辑成功！"
-        });
-        res.end();
-      })
-      .catch(() => {
+    return EPSGoods.query({ title: req.body.title }).then(result => {
+      if (result.length && result.length[0]._id !== req.body._id) {
         res.send({
           code: 100,
-          msg: "服务器异常！"
+          msg: "该产品已存在！"
         });
         res.end();
-      });
+      } else {
+        req.body.joinStock = "";
+        return EPSGoods.update(req.body)
+          .then(() => {
+            res.send({
+              code: 0,
+              msg: "编辑成功！"
+            });
+            res.end();
+          })
+          .catch(() => {
+            res.send({
+              code: 100,
+              msg: "服务器异常！"
+            });
+            res.end();
+          });
+      }
+    });
   });
   // 增加入库记录接口
   postHandler(app, "/api/ybs_add_stocklog.json", (req, res) => {
@@ -551,7 +561,7 @@ const apiRouters = app => {
   });
   // 查询活动接口
   getHandler(app, "/api/ybs_active.json", (req, res) => {
-    return EPSActiveList.query(req.query).then(result => {
+    return EPSActive.query({}).then(result => {
       let resData = [[], 1, 0];
       if (result) {
         let {
@@ -577,9 +587,9 @@ const apiRouters = app => {
             ) {
               if (validate == "0") {
                 resArray.push(result[i]);
-              } else if (validate == "1" && result[i].end_time > +new Date()) {
+              } else if (validate == "1" && (+new Date(result[i].end_time) > +new Date())) {
                 resArray.push(result[i]);
-              } else if (validate == "2" && result[i].end_time < +new Date()) {
+              } else if (validate == "2" && (+new Date(result[i].end_time) < +new Date())) {
                 resArray.push(result[i]);
               }
             } else {
@@ -602,7 +612,7 @@ const apiRouters = app => {
   });
   // 增加活动接口
   postHandler(app, "/api/ybs_add_active.json", (req, res) => {
-    return EPSActiveList.query({ title: req.body.title }).then(result => {
+    return EPSActive.query({ title: req.body.title }).then(result => {
       if (
         Object.prototype.toString.call(result) === "[object Array]" &&
         result.length
@@ -613,7 +623,8 @@ const apiRouters = app => {
         });
         res.end();
       } else {
-        return EPSActiveList.create(req.body)
+        req.body.list = JSON.stringify(req.body.list);
+        return EPSActive.create(req.body)
           .then(() => {
             res.send({
               code: 0,
@@ -633,25 +644,36 @@ const apiRouters = app => {
   });
   // 编辑活动接口
   postHandler(app, "/api/ybs_update_active.json", (req, res) => {
-    return EPSActiveList.update(req.body)
-      .then(() => {
-        res.send({
-          code: 0,
-          msg: "编辑成功！"
-        });
-        res.end();
-      })
-      .catch(() => {
+    return EPSActive.query({title: req.body.title}).then(result => {
+      if (result.length && result[0]._id  !== req.body._id) {
         res.send({
           code: 100,
-          msg: "服务器异常！"
+          msg: "该活动已存在！"
         });
         res.end();
-      });
+      } else {
+        req.body.list = JSON.stringify(req.body.list);
+        return EPSActive.update(req.body)
+        .then(() => {
+          res.send({
+            code: 0,
+            msg: "编辑成功！"
+          });
+          res.end();
+        })
+        .catch(() => {
+          res.send({
+            code: 100,
+            msg: "服务器异常！"
+          });
+          res.end();
+        });
+      }
+    })
   });
   // 删除活动接口
   postHandler(app, "/api/ybs_delete_active.json", (req, res) => {
-    return EPSActiveList.delete(req.body)
+    return EPSActive.delete(req.body)
       .then(() => {
         res.send({
           code: 0,

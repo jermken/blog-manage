@@ -27,8 +27,8 @@ const MenuMap = [{
         link: '/home/YBS/dayConsume',
         txt: '消费记录'
     },{
-        key: '/home/YBS/activeList',
-        link: '/home/YBS/activeList',
+        key: '/home/YBS/active',
+        link: '/home/YBS/active',
         txt: '优惠活动表'
     },{
         key: '/home/YBS/clientInfo',
