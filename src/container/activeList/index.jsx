@@ -197,9 +197,6 @@ export default class ActiveList extends Component {
             detailVisble: false
         });
     }
-    deleteActive = (id) => {
-
-    }
     iptChange = (e) => {
         let type = e.target.dataset.symbol;
         let { queryParams } = this.state;
@@ -233,8 +230,8 @@ export default class ActiveList extends Component {
     }
     datePickerChange = (date, dataStr) => {
       let { queryParams } = this.state;
-      queryParams.begin_time = +new Date(dataStr[0]);
-      queryParams.end_time = +new Date(dataStr[1]);
+      queryParams.begin_time =dataStr[0] ? +new Date(dataStr[0]) : '';
+      queryParams.end_time = dataStr[1] ? +new Date(dataStr[1]) : '';
       this.fetchData(queryParams);
     }
     projectInfoChange = (e,idx,type) => {

@@ -572,28 +572,52 @@ const apiRouters = app => {
           page,
           pageSize
         } = req.query;
-        let beginIndex = (page - 1) * pageSize;
-        (endIndex = (page - 1) * pageSize + pageSize - 1),
-          (resArray = []),
-          (pageArray = []);
+        let beginIndex = (page - 1) * pageSize,
+          endIndex = (page - 1) * pageSize + pageSize - 1,
+          resArray = [],
+          pageArray = [];
         for (let i = 0, len = result.length; i < len; i++) {
           if (result[i].title.indexOf(title) > -1) {
             result[i].list = JSON.parse(result[i].list);
-            if (
-              begin_time &&
-              end_time &&
-              begin_time <= result[i].create_time &&
-              end_time >= result[i].create_time
-            ) {
-              if (validate == "0") {
+            if (validate === "0") {
+              if (
+                begin_time &&
+                end_time &&
+                begin_time <= +new Date(result[i].end_time) &&
+                end_time >= +new Date(result[i].begin_time)
+              ) {
                 resArray.push(result[i]);
-              } else if (validate == "1" && (+new Date(result[i].end_time) > +new Date())) {
-                resArray.push(result[i]);
-              } else if (validate == "2" && (+new Date(result[i].end_time) < +new Date())) {
+              } else if (!begin_time && !end_time) {
                 resArray.push(result[i]);
               }
-            } else {
-              resArray.push(result[i]);
+            } else if (
+              validate === "1" &&
+              +new Date(result[i].end_time) > +new Date()
+            ) {
+              if (
+                begin_time &&
+                end_time &&
+                begin_time <= +new Date(result[i].end_time) &&
+                end_time >= +new Date(result[i].begin_time)
+              ) {
+                resArray.push(result[i]);
+              } else if (!begin_time && !end_time) {
+                resArray.push(result[i]);
+              }
+            } else if (
+              validate === "2" &&
+              +new Date(result[i].end_time) < +new Date()
+            ) {
+              if (
+                begin_time &&
+                end_time &&
+                begin_time <= +new Date(result[i].end_time) &&
+                end_time >= +new Date(result[i].begin_time)
+              ) {
+                resArray.push(result[i]);
+              } else if (!begin_time && !end_time) {
+                resArray.push(result[i]);
+              }
             }
           }
         }
@@ -644,8 +668,8 @@ const apiRouters = app => {
   });
   // 编辑活动接口
   postHandler(app, "/api/ybs_update_active.json", (req, res) => {
-    return EPSActive.query({title: req.body.title}).then(result => {
-      if (result.length && result[0]._id  !== req.body._id) {
+    return EPSActive.query({ title: req.body.title }).then(result => {
+      if (result.length && result[0]._id !== req.body._id) {
         res.send({
           code: 100,
           msg: "该活动已存在！"
@@ -654,22 +678,22 @@ const apiRouters = app => {
       } else {
         req.body.list = JSON.stringify(req.body.list);
         return EPSActive.update(req.body)
-        .then(() => {
-          res.send({
-            code: 0,
-            msg: "编辑成功！"
+          .then(() => {
+            res.send({
+              code: 0,
+              msg: "编辑成功！"
+            });
+            res.end();
+          })
+          .catch(() => {
+            res.send({
+              code: 100,
+              msg: "服务器异常！"
+            });
+            res.end();
           });
-          res.end();
-        })
-        .catch(() => {
-          res.send({
-            code: 100,
-            msg: "服务器异常！"
-          });
-          res.end();
-        });
       }
-    })
+    });
   });
   // 删除活动接口
   postHandler(app, "/api/ybs_delete_active.json", (req, res) => {
