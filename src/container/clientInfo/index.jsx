@@ -14,7 +14,8 @@ import {
   Tag,
   InputNumber,
   Avatar,
-  Radio
+  Radio,
+  message
 } from "antd";
 import "./index.scss";
 import request from "../../server/server";
@@ -29,7 +30,20 @@ export default class ClientInfo extends Component {
     super(props);
     this.state = {
       columns: [],
-      validateStatus: {},
+      validateStatus: {
+        name: {
+          error: false,
+          help: ''
+        },
+        booker: {
+          error: false,
+          help: ''
+        },
+        contact: {
+          error: false,
+          help: ''
+        }
+      },
       detailVisble: false,
       dataList: [],
       tableLoading: false,
@@ -39,7 +53,7 @@ export default class ClientInfo extends Component {
         name: "",
         vipCode: "",
         booker: "",
-        sexual: "",
+        sexual: "1",
         isVip: 0,
         page: 1,
         pageSize: 8
@@ -48,47 +62,34 @@ export default class ClientInfo extends Component {
       current: 1,
       pageSize: 10,
       detailData: {},
-      serverName: []
+      staffList: []
     };
   }
   componentWillMount() {
     this.initColumns();
-    //this.fetchData(this.state.queryParams);
-    let data = [
-      {
-        name: "张一",
-        create_time: 1530093403514,
-        update_time: 1530093403514,
-        isVip: true,
-        vipCode: "13212121212",
-        sexual: 2,
-        booker: "小杰",
-        _id: "fdsfsd345d",
-        contact: "13212387654",
-        balance: 123,
-        activeList: []
-      },
-      {
-        name: "张二",
-        create_time: 1530093403514,
-        update_time: 1530093403514,
-        isVip: false,
-        vipCode: "",
-        sexual: 1,
-        booker: "小婷",
-        _id: "fdsfsd34de5d",
-        contact: "13212387654",
-        balance: 343,
-        activeList: []
+    this.fetchData();
+    this.fetchStaffList();
+  }
+  fetchStaffList() {
+    request.reqGET('epsStaffList', {name: '', status: 1, page: 1, pageSize: 10}, (res) => {
+      if(!res.code) {
+          this.setState({
+              staffList: res.data[0]
+          });
+      } else {
+          message.error('服务器异常，请稍后重试');
       }
-    ];
-    this.setState({ dataList: data });
+    });
   }
   fetchData(queryParams) {
-    let that = this;
+    queryParams = queryParams || this.state.queryParams;
     request.reqGET("epsUserList", { ...queryParams }, res => {
       if (!res.code) {
-        that.setState({ dataList: res.data });
+        this.setState({ 
+        dataList: res.data[0],
+        total: res.data[2],
+        queryParams
+        });
       } else {
         Modal.error({
           title: "",
@@ -166,7 +167,7 @@ export default class ClientInfo extends Component {
         width: 150,
         render: (text, row, index) => {
           return (
-            <span>{text ? <Avatar size="large" src={vipIcon} /> : ""}</span>
+            <span>{text === 1 ? <Avatar size="large" src={vipIcon} /> : ""}</span>
           );
         }
       },
@@ -219,14 +220,7 @@ export default class ClientInfo extends Component {
               >
                 删除
               </a>
-              {row.isVip ? <span className="gap-line"></span> : ''}
-              {row.isVip? <a
-                className="action-aLink"
-                href="javascript:;"
-                onClick={() => that.deleteList(row.id)}
-              >
-                充值
-              </a> : ''}
+              {row.isVip === 1 ? <span className="gap-line"></span> : ''}
             </span>
           );
         }
@@ -241,24 +235,33 @@ export default class ClientInfo extends Component {
   }
   datePickerChange() {}
 
-  selectChange() {}
+  selectChange = (e,type) => {
+    let { queryParams } = this.state;
+    queryParams[type] = e.target.value;
+    this.fetchData(queryParams);
+  }
 
-  queryTableList() {
-    this.fetchData(this.state.queryParams);
+  queryClientList = () => {
+    let { queryParams } = this.state;
+    console.log(this);
+    queryParams.name = this.refs.userName.input.value;
+    queryParams.vipCode = this.refs.vipCode.input.value;
+    this.fetchData(queryParams);
   }
 
   pageChange() {}
-  addUser() {
+  addUser = () => {
     let detailData = {
       name: "",
       create_time: 0,
       update_time: 0,
-      isVip: false,
+      isVip: 2,
       vipCode: "",
       sexual: '1',
       booker: "",
       contact: "",
-      balance: 0
+      balance: 0,
+      activeList: []
     };
     this.setState({ detailVisble: true, detailData: detailData });
   }
@@ -281,7 +284,7 @@ export default class ClientInfo extends Component {
       validateStatus.booker.error = '';
       validateStatus.booker.help = '';
     }
-    if (detailData.contact && /^[1][3,4,5,7,8][0-9]{9}$/.test(detailData.contact)) {
+    if (detailData.contact && !/^[1][3,4,5,7,8][0-9]{9}$/.test(detailData.contact)) {
       validateStatus.contact.error = 'error';
       validateStatus.contact.help = '手机号码格式有误';
       isValidate = false;
@@ -292,59 +295,49 @@ export default class ClientInfo extends Component {
     this.setState({validateStatus: validateStatus});
     return isValidate;
   }
-  handleEdit() {
+  handleEdit = () => {
     let that = this;
     let { detailData } = that.state;
     let create_time = +new Date();
     let update_time = create_time;
     if (this.checkEditInfo(detailData)) {
-      let { _id } = detailData._id;
-      _id ? request.reqPOST("epsEditUser", { ...detailData, update_time, _id }, res => {
+      detailData._id ? request.reqPOST("epsEditUser", { ...detailData, update_time, _id: detailData._id }, res => {
         if (!res.code) {
-          Modal.success({
-            title: "编辑成功！",
-            okText: "确定",
-            onOk: () => {}
+          message.success('编辑成功！');
+          this.setState({
+            detailVisble: false
           });
+          this.fetchData();
         } else {
-          Modal.error({
-            title: "",
-            content: res.msg
-          });
+          message.error(res.msg);
         }
       }) : request.reqPOST("epsAddUser", { ...detailData, create_time, update_time }, res => {
         if (!res.code) {
-          Modal.success({
-            title: "新增成功！",
-            okText: "确定",
-            onOk: () => {}
-          });
+          message.success("新增成功！");
           that.setState({detailVisble: false});
+          this.fetchData();
         } else {
-          Modal.error({
-            title: "",
-            content: res.msg
-          });
+          message.error(res.msg);
         }
       })
     }
   }
-  editCancel() {
+  editCancel = () => {
     this.setState({ detailVisble: false });
   }
-  detailIptChange(e) {
+  detailIptChange = (e) => {
     let val = e.target.value,
       type = e.target.dataset.type,
       detailData = this.state.detailData;
     detailData[type] = val.replace(/(^\s+)|(\s+$)/g,"");
     this.setState({ detailData: detailData });
   }
-  detailSexualChange(e) {
+  detailSexualChange = (e) => {
     let detailData = this.state.detailData;
     detailData.sexual = e;
     this.setState({ detailData: detailData });
   }
-  detailBookerChange(e) {
+  detailBookerChange = (e) => {
     let detailData = this.state.detailData;
     detailData.booker = e;
     this.setState({ detailData: detailData });
@@ -363,7 +356,7 @@ export default class ClientInfo extends Component {
       projectList,
       validateStatus,
       detailData,
-      serverName
+      staffList
     } = that.state;
     const { TextArea } = Input;
     return (
@@ -386,7 +379,7 @@ export default class ClientInfo extends Component {
                   labelCol={{ span: 8 }}
                   wrapperCol={{ span: 16 }}
                 >
-                  <Input placeholder="请输入姓名" ref="userName" />
+                  <Input defaultValue="" placeholder="请输入姓名" ref="userName" />
                 </Form.Item>
               </Col>
               <Col span={4}>
@@ -395,7 +388,7 @@ export default class ClientInfo extends Component {
                   labelCol={{ span: 8 }}
                   wrapperCol={{ span: 16 }}
                 >
-                  <Input placeholder="请输入会员号" ref="vipCode" />
+                  <Input defaultValue="" placeholder="请输入会员号" ref="vipCode" />
                 </Form.Item>
               </Col>
               <Col span={3}>
@@ -406,11 +399,11 @@ export default class ClientInfo extends Component {
                 >
                   <Select
                     value={queryParams.serverName}
-                    onChange={that.selectChange.bind(that)}
+                    onChange={ (e) => {that.selectChange(e, 'booker')}}
                   >
-                    {serverName.map(i => (
-                      <Option value={i._id} key={i._id}>
-                        {i.text}
+                    {staffList.map(i => (
+                      <Option value={i.name} key={i._id}>
+                        {i.name}
                       </Option>
                     ))}
                   </Select>
@@ -424,10 +417,10 @@ export default class ClientInfo extends Component {
                 >
                   <Select
                     value={queryParams.sexual}
-                    onChange={that.selectChange.bind(that)}
+                    onChange={(e) => {that.selectChange(e, 'sexual')}}
                   >
-                    <Option value="1">女士</Option>
-                    <Option value="2">男士</Option>
+                    <Option value={"1"}>女士</Option>
+                    <Option value={"2"}>男士</Option>
                   </Select>
                 </Form.Item>
               </Col>
@@ -450,11 +443,11 @@ export default class ClientInfo extends Component {
             <Button
               type="primary"
               className="btn-area_item"
-              onClick={that.queryTableList.bind(that)}
+              onClick={that.queryClientList}
             >
               查询
             </Button>
-            <Button className="btn-area_item" onClick={that.addUser.bind(that)}>
+            <Button className="btn-area_item" onClick={that.addUser}>
               新增
             </Button>
           </div>
@@ -480,8 +473,8 @@ export default class ClientInfo extends Component {
         <Modal
           title="客户信息"
           visible={detailVisble}
-          onOk={that.handleEdit.bind(that)}
-          onCancel={that.editCancel.bind(that)}
+          onOk={that.handleEdit}
+          onCancel={that.editCancel}
           okText="确定"
           cancelText="取消"
           maskClosable={false}
@@ -492,12 +485,14 @@ export default class ClientInfo extends Component {
               labelCol={{ span: 4 }}
               wrapperCol={{ span: 10 }}
               required={true}
+              validateStatus={validateStatus.name.error? 'error' : ''}
+              help={validateStatus.name.help}
             >
               <Input
                 value={detailData.name}
                 placeholder="请输入客户姓名"
-                data-type="userName"
-                onChange={that.detailIptChange.bind(that)}
+                data-type="name"
+                onChange={that.detailIptChange}
               />
             </Form.Item>
             <Form.Item
@@ -507,7 +502,7 @@ export default class ClientInfo extends Component {
                 >
                   <Select
                     value={detailData.sexual}
-                    onChange={that.detailSexualChange.bind(that)}
+                    onChange={that.detailSexualChange}
                   >
                     <Option value="1">女士</Option>
                     <Option value="2">男士</Option>
@@ -522,19 +517,21 @@ export default class ClientInfo extends Component {
                 value={detailData.birthday}
                 placeholder="请输入出生日期"
                 data-type="birthday"
-                onChange={that.detailIptChange.bind(that)}
+                onChange={that.detailIptChange}
               />
             </Form.Item>
             <Form.Item
               label="联系方式"
               labelCol={{ span: 4 }}
               wrapperCol={{ span: 10 }}
+              validateStatus={validateStatus.contact.error? 'error' : ''}
+              help={validateStatus.contact.help}
             >
               <Input
                 value={detailData.contact}
                 placeholder="请输入联系方式"
                 data-type="contact"
-                onChange={that.detailIptChange.bind(that)}
+                onChange={that.detailIptChange}
               />
             </Form.Item>
             <Form.Item
@@ -542,14 +539,16 @@ export default class ClientInfo extends Component {
               labelCol={{ span: 4 }}
               wrapperCol={{ span: 10 }}
               required={true}
+              validateStatus={validateStatus.booker.error? 'error' : ''}
+              help={validateStatus.booker.help}
             >
               <Select
               value={detailData.booker}
-              onChange={that.detailBookerChange.bind(that)}
+              onChange={that.detailBookerChange}
               >
-                {serverName.map(i => (
-                  <Option value={i._id} key={i._id}>
-                    {i.text}
+                {staffList.map(i => (
+                  <Option value={i.name} key={i._id}>
+                    {i.name}
                   </Option>
                 ))}
               </Select>
@@ -566,7 +565,7 @@ export default class ClientInfo extends Component {
               labelCol={{ span: 4 }}
               wrapperCol={{ span: 18 }}
               value={detailData.desc}
-              onChange={that.detailIptChange.bind(that)}
+              onChange={that.detailIptChange}
               data-type="desc"
             >
             <TextArea

@@ -35,15 +35,14 @@ const EPSUserSchema = new Schema('EPSUser', {
     name: {type: 'string'},
     create_time: {type: 'number'},
     update_time: {type: 'number'},
-    isVip: {type: 'boolean'},
+    isVip: {type: 'number'},
     vipCode: {type: 'string'},
-    sexual: {type: 'number'},
+    sexual: {type: 'string'},
     booker: {type: 'string'},
     contact: {type: 'string'},
     birthday: {type: 'string'},
-    active: {type: 'array'},
     balance: {type: 'number'},
-    avatar: {type: 'string'}
+    activeList: {type: 'string'}
 })
 // 依柏诗消费记录表
 const EPSConsumeSchema = new Schema('EPSConsume', {

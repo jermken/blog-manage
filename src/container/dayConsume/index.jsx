@@ -12,11 +12,15 @@ import {
   Modal,
   Tooltip,
   Tag,
-  InputNumber
+  InputNumber,
+  Radio,
+  message
 } from "antd";
 import "./index.scss";
-const Option = Select.Option;
+import request from "../../server/server";
+const { Option, OptGroup} = Select;
 const { RangePicker } = DatePicker;
+const RadioGroup = Radio.Group;
 export default class DayConsume extends Component {
   constructor(props) {
     super(props);
@@ -30,70 +34,7 @@ export default class DayConsume extends Component {
         amount: false
       },
       detailVisble: false,
-      projectList: [
-        {
-          text: "洗脸",
-          value: "1"
-        },
-        {
-          text: "美甲",
-          value: "2"
-        },
-        {
-          text: "脱毛",
-          value: "3"
-        },
-        {
-          text: "化妆",
-          value: "4"
-        },
-        {
-          text: "修眉",
-          value: "5"
-        }
-      ],
-      dataList: [
-        {
-          time: "2018-06-22",
-          userName: "客户1",
-          sexual: "1",
-          serverName: {
-            text: '小李子',
-            value: '1'
-          },
-          projectList: [{
-            text: "洗脸",
-            value: "1"
-          },
-          {
-            text: "美甲",
-            value: "2"
-          }],
-          amount: "230",
-          paymentWay: ["wechat", "cash"],
-          desc:
-          "这是第二次进店，这是第三次进店，这是第四次进店这是第二次进店，这是第三次进店，这是第四次进店",
-          id: "erwen23432432n"
-        },
-        {
-          time: "2018-06-22",
-          userName: "客户1",
-          sexual: "1",
-          serverName: {
-            text: '小婷子',
-            value: '2'
-          },
-          projectList: [{
-            text: "美甲",
-            value: "2"
-          }],
-          amount: "230",
-          paymentWay: ["card"],
-          desc:
-          "这是第二次进店，这是第三次进店，这是第四次进店这是第二次进店，这是第三次进店，这是第四次进店",
-          id: "erwen2343332432n"
-        }
-      ],
+      dataList: [],
       tableLoading: false,
       queryParams: {
         startT: "",
@@ -107,16 +48,39 @@ export default class DayConsume extends Component {
       pageSize: 10,
       detailData: {
         userName: "",
-        projectList: [],
+        projectList: '',
         serverName: {},
         amount: "",
         paymentWay: [],
         desc: ""
-      }
+      },
+      userList: [],
+      staffList: [],
+      isShowToVip: false,
+      rechargeToVip: null,
+      rechargeVisable: false,
+      rechargeBooker: null,
+      rechargeUser: '',
+      consumeUser: '',
+      rechargeUserInfo: {},
+      consumeUserInfo: {},
+      userType: 1
     };
   }
   componentWillMount() {
     this.initColumns();
+    this.fetchStaffList();
+  }
+  fetchStaffList() {
+    request.reqGET('epsStaffList', {name: '', status: 1, page: 1, pageSize: 10}, (res) => {
+      if(!res.code) {
+          this.setState({
+              staffList: res.data[0]
+          });
+      } else {
+          message.error('服务器异常，请稍后重试');
+      }
+    });
   }
   formatTime(timeStamp) {
     return timeStamp;
@@ -232,7 +196,7 @@ export default class DayConsume extends Component {
     let detailData = this.state.detailData;
     detailData = {
       userName: row.userName,
-      projectList: row.projectList.map(i => i.value),
+      projectList: row.projectList.join(' '),
       serverName: row.serverName,
       amount: row.amount,
       paymentWay: row.paymentWay,
@@ -267,6 +231,12 @@ export default class DayConsume extends Component {
           color: "gold"
         };
         break;
+      case "balance":
+        obj = {
+          text: "扣卡",
+          color: "purple"
+        };
+        break;
       default:
         obj = {
           text: "其他",
@@ -286,7 +256,7 @@ export default class DayConsume extends Component {
     let detailData = this.state.detailData;
     detailData = {
       userName: "",
-      projectList: [],
+      projectList: '',
       serverName: "",
       amount: "",
       paymentWay: [],
@@ -307,20 +277,112 @@ export default class DayConsume extends Component {
     detailData[type] = val;
     this.setState({ detailData: detailData });
   }
-  detailProjectChange(e) {
-    let detailData = this.state.detailData;
-    detailData.projectList = e;
-    this.setState({ detailData: detailData });
-  }
   detailPaymentWayChange(e) {
     let detailData = this.state.detailData;
     detailData.paymentWay = e;
     this.setState({ detailData: detailData });
   }
-  detailServerNameChange(e) {
+  detailServerNameChange = (e) => {
     let detailData = this.state.detailData;
     detailData.serverName.value = e;
     this.setState({ detailData: detailData });
+  }
+  recharge = () => {
+    this.setState({
+      rechargeVisable: true,
+      rechargeToVip: null,
+      isShowToVip: false,
+      rechargeUserInfo: {}
+    })
+  }
+  vipOperation = (e) => {
+    this.setState({
+      rechargeToVip: e.target.value
+    })
+  }
+  userTypeChange = (e) => {
+    this.setState({
+      userType: e.target.value
+    });
+  }
+  checkRecharge() {
+    return true;
+  }
+  handleRecharge = () => {
+    if (this.checkRecharge()) {
+      let { rechargeUserInfo, rechargeToVip } = this.state;
+      let update_time = +new Date();
+      rechargeUserInfo.balance = rechargeUserInfo.balance * 1 + Number(this.refs.rechargeIpt.input.value);
+      rechargeUserInfo.isVip = rechargeToVip || 2;
+      request.reqPOST("epsEditUser", {...rechargeUserInfo, update_time}, res => {
+        if (!res.code) {
+          message.success('充值成功！');
+          
+        } else {
+          message.error(res.msg);
+        }
+      })
+    }
+  }
+  rechargeCancel = () => {
+    this.setState({
+      rechargeVisable: false
+    })
+  }
+  rechargeBookerChange = (e) => {
+    this.setState({
+      rechargeBooker: e
+    })
+  }
+  getUsersName = (e) => {
+    request.reqGET("epsUserList", { 
+      startT: "",
+      endT: "",
+      name: e,
+      vipCode: "",
+      booker: "",
+      sexual: "1",
+      isVip: 0,
+      page: 1,
+      pageSize: 8
+     }, res => {
+      if (!res.code) {
+        this.setState({
+        userList: res.data[0]
+        });
+      } else {
+        Modal.error({
+          title: "",
+          content: res.msg
+        });
+      }
+    });
+  }
+  rechargeUserChange = (e) => {
+    let { userList, rechargeUserInfo } = this.state;
+    let isShowToVip = false;
+    userList.forEach((i) => {
+      if (i.name == e) {
+        isShowToVip = i.isVip == 1? false : true;
+        rechargeUserInfo = i;
+      }
+    });
+    this.setState({
+      rechargeUser: e,
+      isShowToVip,
+      rechargeUserInfo
+    });
+  }
+  consumeUserChange = (e) => {
+    let { userList, consumeUserInfo } = this.state;
+    userList.forEach((i) => {
+      if (i.name == e) {
+        consumeUserInfo = i;
+      }
+    });
+    this.setState({
+      consumeUserInfo
+    });
   }
   render() {
     let that = this;
@@ -333,9 +395,17 @@ export default class DayConsume extends Component {
       current,
       pageSize,
       detailVisble,
-      projectList,
       validateStatus,
-      detailData
+      detailData,
+      userList,
+      staffList,
+      rechargeToVip,
+      isShowToVip,
+      rechargeBooker,
+      userType,
+      rechargeUser,
+      consumeUser,
+      rechargeVisable
     } = that.state;
     const { TextArea } = Input;
     return (
@@ -370,11 +440,11 @@ export default class DayConsume extends Component {
                   value={queryParams.serverName}
                   onChange={that.selectChange.bind(that)}
                 >
-                  <Option value="html">服务人1</Option>
-                  <Option value="node">服务人2</Option>
-                  <Option value="js">服务人3</Option>
-                  <Option value="css">服务人4</Option>
-                  <Option value="tool">服务人5</Option>
+                  {staffList.map(i => (
+                  <Option value={i.name} key={i._id}>
+                    {i.name}
+                  </Option>
+                ))}
                 </Select>
               </Form.Item>
             </Col>
@@ -396,17 +466,24 @@ export default class DayConsume extends Component {
             <Col span={6}>
               <Form.Item>
                 <Button
-                  type="primary"
-                  className="search-btn"
+                  className="dayConsume-btn"
                   onClick={that.queryTableList.bind(that)}
                 >
                   查询
                 </Button>
                 <Button
-                  className="search-btn"
+                  type="primary"
+                  className="dayConsume-btn"
                   onClick={that.addConsume.bind(that)}
                 >
                   新增
+                </Button>
+                <Button
+                  type="primary"
+                  className="dayConsume-btn"
+                  onClick={that.recharge}
+                >
+                  充值
                 </Button>
               </Form.Item>
             </Col>
@@ -440,7 +517,17 @@ export default class DayConsume extends Component {
           maskClosable={false}
         >
           <Form>
-            <Form.Item
+          <Form.Item
+            label="客户类型"
+            labelCol={{span: 4}}
+            wrapperCol={{span: 16}}
+          >
+          <RadioGroup onChange={this.userTypeChange} value={userType}>
+            <Radio value={1}>游客</Radio>
+            <Radio value={2}>已登记客户</Radio>
+            </RadioGroup>
+          </Form.Item>
+            {userType == 2 ? <Form.Item
               label="客户姓名"
               labelCol={{ span: 4 }}
               wrapperCol={{ span: 10 }}
@@ -448,32 +535,41 @@ export default class DayConsume extends Component {
               validateStatus={validateStatus.userName ? "error" : ""}
               help={validateStatus.userName ? "请输入客户姓名" : ""}
             >
-              <Input
-                value={detailData.userName}
-                placeholder="请输入客户姓名"
-                data-type="userName"
-                onChange={that.detailIptChange.bind(that)}
-              />
-            </Form.Item>
+              <Select
+              showSearch
+              value={consumeUser}
+              onChange={that.consumeUserChange}
+              onSearch={this.getUsersName}
+              notFoundContent="未找到"
+              >
+                {userList.map(i => (
+                  <Option value={i.name} key={i._id}>
+                    {i.name}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item> : null}
+            {userType == 2 ? <Form.Item
+              label="参与活动"
+              labelCol={{ span: 4 }}
+              wrapperCol={{ span: 10 }}
+              required={true}
+            >
+              <Select>
+                {<OptGroup>
+                  {<Option></Option>}
+                </OptGroup>}
+              </Select>
+            </Form.Item> : null}
             <Form.Item
               label="项目"
               labelCol={{ span: 4 }}
               wrapperCol={{ span: 20 }}
               required={true}
-              validateStatus={validateStatus.projectName ? "error" : ""}
-              help={validateStatus.projectName ? "请选择项目" : ""}
+              validateStatus="warning"
+              help="多个项目需以空格隔开"
             >
-              <Select
-                onChange={that.detailProjectChange.bind(that)}
-                value={detailData.projectList}
-                mode="multiple"
-              >
-                {projectList.map(i => (
-                  <Option key={i.value} value={i.value}>
-                    {i.text}
-                  </Option>
-                ))}
-              </Select>
+              <Input placeholder="请输入项目" value={detailData.projectList}/>
             </Form.Item>
             <Form.Item
               label="付款方式"
@@ -492,10 +588,11 @@ export default class DayConsume extends Component {
                 <Option value="alipay">支付宝</Option>
                 <Option value="card">刷卡</Option>
                 <Option value="cash">现金</Option>
+                <Option value="balance">扣卡</Option>
               </Select>
             </Form.Item>
             <Form.Item
-              label="服务人"
+              label="登记人"
               labelCol={{ span: 4 }}
               wrapperCol={{ span: 16 }}
               required={true}
@@ -503,11 +600,14 @@ export default class DayConsume extends Component {
               help={validateStatus.serverName ? "请输入服务人员" : ""}
             >
               <Select
-                onChange={that.detailServerNameChange.bind(that)}
+                onChange={that.detailServerNameChange}
                 value={detailData.serverName.value}
               >
-                <Option value="1">小李子</Option>
-                <Option value="2">小婷子</Option>
+                {staffList.map(i => (
+                  <Option value={i.name} key={i._id}>
+                    {i.name}
+                  </Option>
+                ))}
               </Select>
             </Form.Item>
             <Form.Item
@@ -533,6 +633,73 @@ export default class DayConsume extends Component {
               />
             </Form.Item>
           </Form>
+        </Modal>
+        <Modal
+          title="充值"
+          visible={rechargeVisable}
+          onOk={that.handleRecharge}
+          onCancel={that.rechargeCancel}
+          okText="确定"
+          cancelText="取消"
+          maskClosable={false}
+        >
+        <Form>
+        <Form.Item
+              label="充值客户"
+              labelCol={{ span: 4 }}
+              wrapperCol={{ span: 10 }}
+              required={true}
+            >
+              <Select
+              showSearch
+              value={rechargeUser}
+              onChange={that.rechargeUserChange}
+              onSearch={this.getUsersName}
+              notFoundContent="未找到"
+              >
+                {userList.map(i => (
+                  <Option value={i.name} key={i._id}>
+                    {i.name}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+          <Form.Item
+              label="登记人"
+              labelCol={{ span: 4 }}
+              wrapperCol={{ span: 10 }}
+              required={true}
+            >
+              <Select
+              value={rechargeBooker}
+              onChange={that.rechargeBookerChange}
+              >
+                {staffList.map(i => (
+                  <Option value={i.name} key={i._id}>
+                    {i.name}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+          <Form.Item
+          label="充值金额"
+          labelCol={{span: 4}}
+          wrapperCol={{span: 16}}
+          required={true}
+          >
+          <Input ref="rechargeIpt"/>
+          </Form.Item>
+          { isShowToVip ? <Form.Item
+            label="成为会员"
+            labelCol={{span: 4}}
+            wrapperCol={{span: 16}}
+          >
+          <RadioGroup onChange={this.vipOperation} value={rechargeToVip}>
+            <Radio value={1}>成为会员</Radio>
+            <Radio value={2}>非会员</Radio>
+            </RadioGroup>
+          </Form.Item> : null }
+        </Form>
         </Modal>
       </div>
     );

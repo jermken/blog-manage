@@ -193,7 +193,10 @@ const apiRouters = app => {
   // 依柏诗管理接口-------------------------------------
   // 查询客户接口
   getHandler(app, "/api/ybs_user.json", (req, res) => {
-    return EPSUser.query(req.query).then(result => {
+    return EPSUser.query({}).then(result => {
+      if (Object.prototype.toString.call(result) !== "[object Array]") {
+        return [[], "1", 0];
+      }
       let {
         name,
         startT,
@@ -214,11 +217,11 @@ const apiRouters = app => {
           result[i].name.indexOf(name) > -1 &&
           result[i].vipCode.indexOf(vipCode) > -1 &&
           result[i].booker.indexOf(booker) > -1 &&
-          result[i].sexual.indexOf(sexual) > -1 &&
-          result[i].isVip.indexOf(isVip) > -1 &&
-          (startT <= result[i].creat_time && endT >= result[i].creat_time)
+          result[i].sexual.indexOf(sexual) > -1
         ) {
-          resArray.push(result[i]);
+          if (isVip == "0" || result[i].isVip == isVip) {
+            resArray.push(result[i]);
+          }
         }
       }
       let total = resArray.length;
@@ -226,6 +229,7 @@ const apiRouters = app => {
         if (j > endIndex) {
           break;
         } else {
+          resArray[j].activeList = JSON.parse(resArray[j].activeList);
           pageArray.push(resArray[j]);
         }
       }
@@ -235,39 +239,68 @@ const apiRouters = app => {
   });
   // 增加客户接口
   postHandler(app, "/api/ybs_add__user.json", (req, res) => {
-    return EPSUser.create(req.body)
-      .then(() => {
-        res.send({
-          code: 0,
-          msg: "新增成功！"
-        });
-        res.end();
-      })
-      .catch(() => {
+    req.body.activeList = JSON.stringify(req.body.activeList);
+    return EPSUser.query({ name: req.body.name }).then(result => {
+      if (
+        Object.prototype.toString.call(result) === "[object Array]" &&
+        result.length
+      ) {
         res.send({
           code: 100,
-          msg: "服务器异常！"
+          msg: "客户已存在！"
         });
         res.end();
-      });
+      } else {
+        return EPSUser.create(req.body)
+          .then(() => {
+            res.send({
+              code: 0,
+              msg: "新增成功！"
+            });
+            res.end();
+          })
+          .catch(() => {
+            res.send({
+              code: 100,
+              msg: "服务器异常！"
+            });
+            res.end();
+          });
+      }
+    });
   });
   // 编辑客户接口
   postHandler(app, "/api/ybs_update__user.json", (req, res) => {
-    return EPSUser.update(req.body)
-      .then(() => {
-        res.send({
-          code: 0,
-          msg: "编辑成功！"
-        });
-        res.end();
-      })
-      .catch(() => {
+    req.body.activeList = JSON.stringify(req.body.activeList);
+    return EPSUser.query({}).then(result => {
+      if (
+        Object.prototype.toString.call(result) === "[object Array]" &&
+        result.length &&
+        result[0]._id != req.body._id
+      ) {
         res.send({
           code: 100,
-          msg: "服务器异常！"
+          msg: "客户已存在！"
         });
         res.end();
-      });
+      } else {
+        return EPSUser.update(req.body)
+          .then(() => {
+            res.send({
+              code: 0,
+              msg: "编辑成功！"
+            });
+            res.end();
+          })
+          .catch(e => {
+            res.send({
+              code: 100,
+              msg: "服务器异常！"
+            });
+            res.end();
+          });
+      }
+    });
   });
   // 删除客户接口
   postHandler(app, "/api/ybs_delete__user.json", (req, res) => {
@@ -331,6 +364,7 @@ const apiRouters = app => {
             pageArray.push(resArray[j]);
           }
         }
+        pageArray.reverse();
         resData = [pageArray, page, total];
       }
       return resData;
@@ -339,7 +373,10 @@ const apiRouters = app => {
   // 增加员工接口
   postHandler(app, "/api/ybs_add_staff.json", (req, res) => {
     return EPSStaff.query({ name: req.body.name }).then(result => {
-      if (!result) {
+      if (
+        Object.prototype.toString.call(result) === "[object Array]" &&
+        !result.length
+      ) {
         return EPSStaff.create(req.body)
           .then(() => {
             res.send({
