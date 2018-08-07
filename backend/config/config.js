@@ -3,7 +3,7 @@ exports.mongodbConfig = {
 }
 
 exports.sessionConfig = {
-    name: 'fedBlog',
-    key: 'fedBlog',
+    name: 'ybs',
+    key: 'ybs',
     maxAge: 10*60*60*1000
 }

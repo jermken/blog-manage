@@ -47,10 +47,14 @@ const EPSUserSchema = new Schema('EPSUser', {
 // 依柏诗消费记录表
 const EPSConsumeSchema = new Schema('EPSConsume', {
     name: {type: 'string'},
-    time: {type: 'number'},
-    projectList: {type: 'array'},
-    balance: {type: 'number'},
-    paymentWay: {type: 'array'},
+    create_time: {type: 'number'},
+    update_time: {type: 'number'},
+    userType: {type: 'number'},
+    projectList: {type: 'string'},
+    cardProject: {type: 'string'},
+    amount: {type: 'number'},
+    amountBalance: {type: 'number'},
+    paymentWay: {type: 'string'},
     serverName: {type: 'string'},
     desc: {type: 'string'}
 })
@@ -93,6 +97,7 @@ const EPSStockLogSchema = new Schema('EPSStockLog', {
 // 依柏诗活动列表
 const EPSActiveSchema = new Schema('EPSActiveList', {
     title: {type: 'string'},
+    price: {type: 'string'},
     create_time: {type: 'number'},
     update_time: {type: 'number'},
     creator: {type: 'string'},

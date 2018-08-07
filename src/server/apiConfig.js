@@ -7,6 +7,10 @@ const apiConfig = {
     login: '/api/login.json', // 登陆
     loginout: '/api/loginout.json', // 登出 
     loginup: '/api/loginup.json', // 注册  
+    epsConsumeList: '/api/ybs_consume.json', // 依柏诗客户列表
+    epsAddConsume: '/api/ybs_add__consume.json', // 增加依柏诗客户
+    epsEditConsume: '/api/ybs_update__consume.json', // 编辑依柏诗客户
+    epsDeleteConsume: '/api/ybs_delete__consume.json', // 删除依柏诗客户
     epsUserList: '/api/ybs_user.json', // 依柏诗客户列表
     epsAddUser: '/api/ybs_add__user.json', // 增加依柏诗客户
     epsEditUser: '/api/ybs_update__user.json', // 编辑依柏诗客户

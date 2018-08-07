@@ -2,6 +2,7 @@ const { noCheckHandler, getHandler, postHandler } = require("./util");
 const {
   User,
   Article,
+  EPSConsume,
   EPSUser,
   EPSStaff,
   EPSGoods,
@@ -12,6 +13,11 @@ const formidable = require("formidable");
 const util = require("util");
 const path = require("path");
 const sha1 = require("sha1");
+
+Array.prototype.isArray = function(arr) {
+  return Object.prototype.toString.call(arr) === "[object Array]";
+};
+
 const apiRouters = app => {
   // 登录接口
   noCheckHandler(app, "/api/login.json", (req, res) => {
@@ -191,10 +197,28 @@ const apiRouters = app => {
   });
 
   // 依柏诗管理接口-------------------------------------
+  // 增加消费记录接口
+  postHandler(app, "/api/ybs_add__consume.json", (req, res) => {
+    return EPSUser.create(req.body)
+      .then(() => {
+        res.send({
+          code: 0,
+          msg: "新增成功！"
+        });
+        res.end();
+      })
+      .catch(() => {
+        res.send({
+          code: 100,
+          msg: "服务器异常！"
+        });
+        res.end();
+      });
+  });
   // 查询客户接口
   getHandler(app, "/api/ybs_user.json", (req, res) => {
     return EPSUser.query({}).then(result => {
-      if (Object.prototype.toString.call(result) !== "[object Array]") {
+      if (Array.isArray(result)) {
         return [[], "1", 0];
       }
       let {
@@ -241,10 +265,7 @@ const apiRouters = app => {
   postHandler(app, "/api/ybs_add__user.json", (req, res) => {
     req.body.activeList = JSON.stringify(req.body.activeList);
     return EPSUser.query({ name: req.body.name }).then(result => {
-      if (
-        Object.prototype.toString.call(result) === "[object Array]" &&
-        result.length
-      ) {
+      if (Array.isArray(result) && result.length) {
         res.send({
           code: 100,
           msg: "客户已存在！"
@@ -274,7 +295,7 @@ const apiRouters = app => {
     req.body.activeList = JSON.stringify(req.body.activeList);
     return EPSUser.query({}).then(result => {
       if (
-        Object.prototype.toString.call(result) === "[object Array]" &&
+        Array.isArray(result) &&
         result.length &&
         result[0]._id != req.body._id
       ) {
@@ -373,10 +394,7 @@ const apiRouters = app => {
   // 增加员工接口
   postHandler(app, "/api/ybs_add_staff.json", (req, res) => {
     return EPSStaff.query({ name: req.body.name }).then(result => {
-      if (
-        Object.prototype.toString.call(result) === "[object Array]" &&
-        !result.length
-      ) {
+      if (Array.isArray(result) && !result.length) {
         return EPSStaff.create(req.body)
           .then(() => {
             res.send({
@@ -473,10 +491,7 @@ const apiRouters = app => {
   postHandler(app, "/api/ybs_add_goods.json", (req, res) => {
     req.body.joinStock = "";
     return EPSGoods.query({ title: req.body.title }).then(result => {
-      if (
-        Object.prototype.toString.call(result) === "[object Array]" &&
-        result.length
-      ) {
+      if (Array.isArray(result) && result.length) {
         res.send({
           code: 100,
           msg: "该产品已存在！"
@@ -551,10 +566,7 @@ const apiRouters = app => {
   // 增加入库记录接口
   postHandler(app, "/api/ybs_add_stocklog.json", (req, res) => {
     return EPSStockLog.query({ title: req.body.title }).then(result => {
-      if (
-        Object.prototype.toString.call(result) === "[object Array]" &&
-        result.length
-      ) {
+      if (Array.isArray(result) && result.length) {
         let obj = result[0];
         let arr = JSON.parse(obj.joinStock);
         arr.push(req.body.joinStock);
@@ -674,10 +686,7 @@ const apiRouters = app => {
   // 增加活动接口
   postHandler(app, "/api/ybs_add_active.json", (req, res) => {
     return EPSActive.query({ title: req.body.title }).then(result => {
-      if (
-        Object.prototype.toString.call(result) === "[object Array]" &&
-        result.length
-      ) {
+      if (Array.isArray(result) && result.length) {
         res.send({
           code: 100,
           msg: "该活动已存在！"

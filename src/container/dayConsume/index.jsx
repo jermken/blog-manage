@@ -27,11 +27,11 @@ export default class DayConsume extends Component {
     this.state = {
       columns: [],
       validateStatus: {
-        userName: false,
-        projectName: false,
-        paymentWay: false,
-        serverName: false,
-        amount: false
+        consumeUser: {},
+        paymentWay: {},
+        serverName: {},
+        amount: {},
+        amountBalance: {}
       },
       detailVisble: false,
       dataList: [],
@@ -39,7 +39,7 @@ export default class DayConsume extends Component {
       queryParams: {
         startT: "",
         endT: "",
-        userName: "",
+        name: "",
         sexual: "1",
         serverName: ""
       },
@@ -47,10 +47,11 @@ export default class DayConsume extends Component {
       current: 1,
       pageSize: 10,
       detailData: {
-        userName: "",
+        name: "",
         projectList: '',
-        serverName: {},
+        serverName: '',
         amount: "",
+        amountBalance: '',
         paymentWay: [],
         desc: ""
       },
@@ -63,13 +64,27 @@ export default class DayConsume extends Component {
       rechargeUser: '',
       consumeUser: '',
       rechargeUserInfo: {},
-      consumeUserInfo: {},
-      userType: 1
+      consumeUserInfo: {
+        activeList:[{
+          title: '活动1',
+          list: [{title: '美甲1', times: 2},{title: '洗脸1', times:1}]
+        },{
+          title: '活动2',
+          list: [{title: '美甲', times: 2},{title: '洗脸', times:0}]
+        }]
+      },
+      activeList: [{
+        title: '活动1',
+        list: [{title: '美甲1', times: 2},{title: '洗脸1', times:1}]
+      },{
+        title: '活动2',
+        list: [{title: '美甲', times: 2},{title: '洗脸', times:1}]
+      }]
     };
   }
   componentWillMount() {
     this.initColumns();
-    this.fetchStaffList();
+    // this.fetchStaffList();
   }
   fetchStaffList() {
     request.reqGET('epsStaffList', {name: '', status: 1, page: 1, pageSize: 10}, (res) => {
@@ -98,7 +113,7 @@ export default class DayConsume extends Component {
       },
       {
         title: "客户姓名",
-        dataIndex: "userName",
+        dataIndex: "name",
         width: 150,
         render: (text, row, index) => {
           return <span>{text}</span>;
@@ -194,13 +209,10 @@ export default class DayConsume extends Component {
   }
   showDetail(row) {
     let detailData = this.state.detailData;
+    let projectList = row.projectList.join(' ');
     detailData = {
-      userName: row.userName,
-      projectList: row.projectList.join(' '),
-      serverName: row.serverName,
-      amount: row.amount,
-      paymentWay: row.paymentWay,
-      desc: row.desc
+      ...row,
+      projectList
     };
     this.setState({ detailVisble: true, detailData: detailData });
   }
@@ -245,46 +257,124 @@ export default class DayConsume extends Component {
     }
     return obj;
   }
-  datePickerChange() { }
+  datePickerChange = (e) => { }
 
-  selectChange() { }
+  selectChange = (e) => { }
 
-  queryTableList() { }
+  queryTableList = (e) => { }
 
-  pageChange() { }
-  addConsume() {
+  pageChange = (e) => { }
+
+  addConsume = () => {
     let detailData = this.state.detailData;
     detailData = {
-      userName: "",
-      projectList: '',
-      serverName: "",
-      amount: "",
+      name: '',
+      projectList: [],
+      serverName: '',
+      amount: '',
+      amountBalance: '',
       paymentWay: [],
-      desc: ""
+      desc: '',
+      cardProject: [],
+      userType: 1
     };
     this.setState({ detailVisble: true, detailData: detailData });
   }
-  handleEdit() {
+  checkoutDetailData(data) {
+    let isValidate = true;
+    let { consumeUser, validateStatus } = this.state;
+    if (data.userType != 1 && !consumeUser) {
+      validateStatus.consumeUser.error = true;
+      validateStatus.consumeUser.help = '请选择已登记客户';
+      isValidate = false;
+    } else {
+      validateStatus.consumeUser.error = false;
+      validateStatus.consumeUser.help = '';
+    }
+    if (!data.paymentWay.length) { 
+      validateStatus.paymentWay.error = true;
+      validateStatus.paymentWay.help = '请选择付款方式';
+      isValidate = false;
+    } else {
+      validateStatus.paymentWay.error = false;
+      validateStatus.paymentWay.help = '';
+    }
+    if (!data.serverName) {
+      validateStatus.serverName.error = true;
+      validateStatus.serverName.help = '请选择登记人';
+      isValidate = false;
+    } else {
+      validateStatus.serverName.error = false;
+      validateStatus.serverName.help = '';
+    }
+    if (data.amountBalance && (!/^[1-9]\d*(.\d{1,2})?$/.test(data.amountBalance) || data.amountBalance < 0)) { 
+      validateStatus.amountBalance.error = true;
+      validateStatus.amountBalance.help = '请填写金额';
+      isValidate = false;
+    } else {
+      validateStatus.amountBalance.error = false;
+      validateStatus.amountBalance.help = '';
+      data.amountBalance = +data.amountBalance;
+    }
+    if (data.userType == 1 && (!/^[1-9]\d*(.\d{1,2})?$/.test(data.amount) || data.amount < 0)) { 
+      validateStatus.amount.error = true;
+      validateStatus.amount.help = '请填写金额';
+      isValidate = false;
+    } else {
+      validateStatus.amount.error = false;
+      validateStatus.amount.help = '';
+      data.amount = +data.amount;
+    }
+    this.setState({
+      validateStatus
+    });
+    return isValidate;
+  }
+  handleEdit = () => {
+    let { detailData, consumeUser } = this.state;
+    let projectList = this.refs.projectList.input.value;
+    if (detailData.userType == 1) {
+      detailData.name = this.refs.trave_user.input.value || '游客';
+    } else {
+      detailData.amountBalance = this.refs.amountBalance.input.value || 0;
+      detailData.name = consumeUser;
+    }
+    detailData.amount = this.refs.amount.input.value;
+    detailData.projectList = projectList ? projectList.split(' ') : [];
+    if (!this.checkoutDetailData(detailData)) {
+      return;
+    }
+    if (detailData._id) {
+      detailData.update_time = +new Date();
+    } else {
+      detailData.create_time = detailData.update_time = +new Date();
+    }
+    console.log(detailData);
     this.setState({ detailVisble: false });
   }
-  editCancel() {
+  editCancel = () => {
     this.setState({ detailVisble: false });
   }
-  detailIptChange(e) {
+  detailIptChange = (e) => {
     let val = e.target.value,
       type = e.target.dataset.type,
       detailData = this.state.detailData;
     detailData[type] = val;
     this.setState({ detailData: detailData });
   }
-  detailPaymentWayChange(e) {
+  cardProjectChange = (e) => {
+    let { detailData } = this.state;
+    detailData.cardProject = e;
+    this.setState({ detailData: detailData });
+  }
+  detailPaymentWayChange = (e) => {
     let detailData = this.state.detailData;
     detailData.paymentWay = e;
     this.setState({ detailData: detailData });
   }
   detailServerNameChange = (e) => {
     let detailData = this.state.detailData;
-    detailData.serverName.value = e;
+    detailData.serverName = e;
     this.setState({ detailData: detailData });
   }
   recharge = () => {
@@ -301,8 +391,10 @@ export default class DayConsume extends Component {
     })
   }
   userTypeChange = (e) => {
+    let { detailData } = this.state;
+    detailData.userType = e.target.value;
     this.setState({
-      userType: e.target.value
+      detailData
     });
   }
   checkRecharge() {
@@ -334,7 +426,7 @@ export default class DayConsume extends Component {
       rechargeBooker: e
     })
   }
-  getUsersName = (e) => {
+  fetchUsersName = (e) => {
     request.reqGET("epsUserList", { 
       startT: "",
       endT: "",
@@ -344,7 +436,7 @@ export default class DayConsume extends Component {
       sexual: "1",
       isVip: 0,
       page: 1,
-      pageSize: 8
+      pageSize: 5
      }, res => {
       if (!res.code) {
         this.setState({
@@ -355,6 +447,24 @@ export default class DayConsume extends Component {
           title: "",
           content: res.msg
         });
+      }
+    });
+  }
+  fetchActiveList(e) {
+    request.reqGET('epsActive',{
+      title: e,
+      validate: '0',
+      begin_time: '',
+      end_time: '',
+      page: 1,
+      pageSize: 5
+    }, res => {
+      if (!res.code) {
+        this.setState({
+          activeList: res.data[0]
+        });
+      } else {
+        message.error(res.msg);
       }
     });
   }
@@ -374,14 +484,27 @@ export default class DayConsume extends Component {
     });
   }
   consumeUserChange = (e) => {
-    let { userList, consumeUserInfo } = this.state;
+    let { userList, consumeUserInfo, detailData } = this.state;
     userList.forEach((i) => {
       if (i.name == e) {
         consumeUserInfo = i;
       }
     });
+    detailData.cardProject = [];
     this.setState({
-      consumeUserInfo
+      consumeUserInfo,
+      detailData
+    });
+  }
+  newCardChange = (e) => {
+    let { detailData, activeList } = this.state;
+    activeList.forEach((i) => {
+      if (i.title == e) {
+        detailData.newCard = i.title;
+      }
+    });
+    this.setState({
+      detailData
     });
   }
   render() {
@@ -402,10 +525,11 @@ export default class DayConsume extends Component {
       rechargeToVip,
       isShowToVip,
       rechargeBooker,
-      userType,
       rechargeUser,
       consumeUser,
-      rechargeVisable
+      rechargeVisable,
+      consumeUserInfo,
+      activeList
     } = that.state;
     const { TextArea } = Input;
     return (
@@ -418,7 +542,7 @@ export default class DayConsume extends Component {
                 labelCol={{ span: 5 }}
                 wrapperCol={{ span: 16 }}
               >
-                <RangePicker onChange={that.datePickerChange.bind(that)} />
+                <RangePicker onChange={that.datePickerChange} />
               </Form.Item>
             </Col>
             <Col span={4}>
@@ -427,7 +551,7 @@ export default class DayConsume extends Component {
                 labelCol={{ span: 8 }}
                 wrapperCol={{ span: 16 }}
               >
-                <Input placeholder="请输入客户姓名" ref="userName" />
+                <Input placeholder="请输入客户姓名" ref="name" />
               </Form.Item>
             </Col>
             <Col span={4}>
@@ -438,7 +562,7 @@ export default class DayConsume extends Component {
               >
                 <Select
                   value={queryParams.serverName}
-                  onChange={that.selectChange.bind(that)}
+                  onChange={that.selectChange}
                 >
                   {staffList.map(i => (
                   <Option value={i.name} key={i._id}>
@@ -456,7 +580,7 @@ export default class DayConsume extends Component {
               >
                 <Select
                   value={queryParams.sexual}
-                  onChange={that.selectChange.bind(that)}
+                  onChange={that.selectChange}
                 >
                   <Option value="1">女士</Option>
                   <Option value="2">男士</Option>
@@ -467,14 +591,14 @@ export default class DayConsume extends Component {
               <Form.Item>
                 <Button
                   className="dayConsume-btn"
-                  onClick={that.queryTableList.bind(that)}
+                  onClick={that.queryTableList}
                 >
                   查询
                 </Button>
                 <Button
                   type="primary"
                   className="dayConsume-btn"
-                  onClick={that.addConsume.bind(that)}
+                  onClick={that.addConsume}
                 >
                   新增
                 </Button>
@@ -501,7 +625,7 @@ export default class DayConsume extends Component {
           <Pagination
             style={{ margin: "0 auto" }}
             total={total}
-            onChange={that.pageChange.bind(that)}
+            onChange={that.pageChange}
             current={current}
             pageSize={pageSize}
             defaultCurrent={1}
@@ -510,8 +634,8 @@ export default class DayConsume extends Component {
         <Modal
           title="消费详情"
           visible={detailVisble}
-          onOk={that.handleEdit.bind(that)}
-          onCancel={that.editCancel.bind(that)}
+          onOk={that.handleEdit}
+          onCancel={that.editCancel}
           okText="确定"
           cancelText="取消"
           maskClosable={false}
@@ -522,24 +646,24 @@ export default class DayConsume extends Component {
             labelCol={{span: 4}}
             wrapperCol={{span: 16}}
           >
-          <RadioGroup onChange={this.userTypeChange} value={userType}>
+          <RadioGroup onChange={this.userTypeChange} value={detailData.userType}>
             <Radio value={1}>游客</Radio>
             <Radio value={2}>已登记客户</Radio>
             </RadioGroup>
           </Form.Item>
-            {userType == 2 ? <Form.Item
+            {detailData.userType == 2 ? <Form.Item
               label="客户姓名"
               labelCol={{ span: 4 }}
               wrapperCol={{ span: 10 }}
               required={true}
-              validateStatus={validateStatus.userName ? "error" : ""}
-              help={validateStatus.userName ? "请输入客户姓名" : ""}
+              validateStatus={validateStatus.consumeUser.error ? "error" : ""}
+              help={validateStatus.consumeUser.help || ''}
             >
               <Select
               showSearch
               value={consumeUser}
               onChange={that.consumeUserChange}
-              onSearch={this.getUsersName}
+              onSearch={this.fetchUsersName}
               notFoundContent="未找到"
               >
                 {userList.map(i => (
@@ -548,39 +672,65 @@ export default class DayConsume extends Component {
                   </Option>
                 ))}
               </Select>
-            </Form.Item> : null}
-            {userType == 2 ? <Form.Item
-              label="参与活动"
+            </Form.Item> : <Form.Item
+              label="游客姓名"
               labelCol={{ span: 4 }}
               wrapperCol={{ span: 10 }}
               required={true}
             >
-              <Select>
-                {<OptGroup>
-                  {<Option></Option>}
-                </OptGroup>}
+              <Input placeholder="请输入游客姓名" ref="trave_user"/>
+            </Form.Item>}
+            {detailData.userType == 2 ? <Form.Item
+              label="套卡项目"
+              labelCol={{ span: 4 }}
+              wrapperCol={{ span: 16 }}
+            >
+              <Select
+              mode="multiple"
+              onChange={this.cardProjectChange}
+              value={detailData.cardProject}
+              >
+                {consumeUserInfo.activeList ? consumeUserInfo.activeList.map((i) => (
+                  <OptGroup label={i.title} key={i.title}>
+                  {i.list.map((j) => (
+                    <Option disabled={j.times=='0' || false} value={i.title+ '#'+ j.title} key={j.title}>{j.title}</Option>
+                  ))}
+                </OptGroup>
+                )) : null}
               </Select>
             </Form.Item> : null}
             <Form.Item
+            label="新增套卡"
+            labelCol={{ span: 4 }}
+            wrapperCol={{ span: 10 }}
+            >
+              <Select
+              showSearch
+              value={detailData.newCard}
+              onChange={that.newCardChange}
+              onSearch={this.fetchActiveList}
+              notFoundContent="未找到"
+              >
+                {activeList.map((i) => (<Option value={i.title} key={i.title}>{i.title}</Option>))}
+              </Select>
+            </Form.Item>
+            <Form.Item
               label="项目"
               labelCol={{ span: 4 }}
-              wrapperCol={{ span: 20 }}
-              required={true}
-              validateStatus="warning"
-              help="多个项目需以空格隔开"
+              wrapperCol={{ span: 16 }}
             >
-              <Input placeholder="请输入项目" value={detailData.projectList}/>
+              <Input placeholder="多个项目需以空格隔开" ref="projectList"/>
             </Form.Item>
             <Form.Item
               label="付款方式"
               labelCol={{ span: 4 }}
               wrapperCol={{ span: 16 }}
               required={true}
-              validateStatus={validateStatus.paymentWay ? "error" : ""}
-              help={validateStatus.paymentWay ? "请选择付款方式" : ""}
+              validateStatus={validateStatus.paymentWay.error ? "error" : ""}
+              help={validateStatus.paymentWay.help || ''}
             >
               <Select
-                onChange={that.detailPaymentWayChange.bind(that)}
+                onChange={that.detailPaymentWayChange}
                 value={detailData.paymentWay}
                 mode="multiple"
               >
@@ -596,12 +746,12 @@ export default class DayConsume extends Component {
               labelCol={{ span: 4 }}
               wrapperCol={{ span: 16 }}
               required={true}
-              validateStatus={validateStatus.serverName ? "error" : ""}
-              help={validateStatus.serverName ? "请输入服务人员" : ""}
+              validateStatus={validateStatus.serverName.error ? "error" : ""}
+              help={validateStatus.serverName.help || ''}
             >
               <Select
                 onChange={that.detailServerNameChange}
-                value={detailData.serverName.value}
+                value={detailData.serverName}
               >
                 {staffList.map(i => (
                   <Option value={i.name} key={i._id}>
@@ -610,15 +760,25 @@ export default class DayConsume extends Component {
                 ))}
               </Select>
             </Form.Item>
+            {detailData.userType == 2 ? <Form.Item
+              label="扣卡金额"
+              labelCol={{ span: 4 }}
+              wrapperCol={{ span: 14 }}
+              required={true}
+              validateStatus={validateStatus.amountBalance.error ? "error" : ""}
+              help={validateStatus.amountBalance.help || ''}
+            >
+              <Input min={0} precision={1} ref="amountBalance"/>
+            </Form.Item> : null}
             <Form.Item
               label="金额"
               labelCol={{ span: 4 }}
               wrapperCol={{ span: 14 }}
               required={true}
-              validateStatus={validateStatus.amount ? "error" : ""}
-              help={validateStatus.amount ? "请输入消费金额" : ""}
+              validateStatus={validateStatus.amount.error ? "error" : ""}
+              help={validateStatus.amount.help || ''}
             >
-              <InputNumber value={detailData.amount} min={0} precision={1} />
+              <Input min={0} precision={1} ref="amount"/>
             </Form.Item>
             <Form.Item
               label="备注"
@@ -626,7 +786,7 @@ export default class DayConsume extends Component {
               wrapperCol={{ span: 16 }}
             >
               <TextArea
-                onChange={that.detailIptChange.bind(that)}
+                onChange={that.detailIptChange}
                 data-type="desc"
                 value={detailData.desc}
                 rows={4}
@@ -654,7 +814,7 @@ export default class DayConsume extends Component {
               showSearch
               value={rechargeUser}
               onChange={that.rechargeUserChange}
-              onSearch={this.getUsersName}
+              onSearch={this.fetchUsersName}
               notFoundContent="未找到"
               >
                 {userList.map(i => (

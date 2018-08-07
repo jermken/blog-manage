@@ -26,6 +26,7 @@ export default class ActiveList extends Component {
             detailVisble: false,
             detail:{
               title: '',
+              price: '',
               begin_time: '',
               end_time: '',
               list: [{
@@ -35,6 +36,7 @@ export default class ActiveList extends Component {
             },
             validate:{
                 title: {},
+                price: {},
                 validate: {},
                 date: {},
                 list: {}
@@ -86,6 +88,7 @@ export default class ActiveList extends Component {
         } else {
             detail = {
                 title: '',
+                price: '',
                 validate: '',
                 begin_time: '2018-07-01',
                 end_time: '2018-07-21',
@@ -110,6 +113,14 @@ export default class ActiveList extends Component {
         } else {
             validate.title.error = false;
             validate.title.help = '';
+        }
+        if (!/^[1-9]\d*(.\d{1,2})?$/.test(detail.price) || detail.price < 0) {
+            validate.price.error = true;
+            validate.price.help = '请填写活动价格';
+            isvalidate = false;
+        } else {
+            validate.price.error = false;
+            validate.price.help = '';
         }
         if (!detail.begin_time) {
             validate.date.error = true;
@@ -295,6 +306,7 @@ export default class ActiveList extends Component {
                     <span className="active-title">{i.title}</span>
                     <div className="active-info">
                       <p className="active-date">有效期：{i.begin_time} 至 {i.end_time}</p>
+                      <p className="active-date">价格：{i.price}</p>
                     </div>
                     <div className="active-operation">
                     <Popconfirm placement="top" title="确定删除该活动？" cancelText="取消" okText="确定" onConfirm={() => {this.deleteActive(i._id)}}>
@@ -322,6 +334,9 @@ export default class ActiveList extends Component {
             <Form>
                 <Form.Item label="活动名称" required labelCol={{ span: 4 }} wrapperCol={{ span: 10 }} help={validate.title.help} validateStatus={validate.title.error? 'error' : ''}>
                     <Input value={detail.title} placeholder="请输入活动名称" onChange={this.detailIptChange} data-symbol="title"/>
+                </Form.Item>
+                <Form.Item label="活动价格" required labelCol={{ span: 4 }} wrapperCol={{ span: 10 }} help={validate.price.help} validateStatus={validate.price.error? 'error' : ''}>
+                    <Input value={detail.price} placeholder="请输入活动价格" onChange={this.detailIptChange} data-symbol="price"/>
                 </Form.Item>
                 <Form.Item label="活动时间" required labelCol={{ span: 4 }} wrapperCol={{ span: 10 }} help={validate.date.help} validateStatus={validate.date.error? 'error' : ''}>
                     {detail.begin_time ? <RangePicker value={[moment(detail.begin_time, dateFormat), moment(detail.end_time, dateFormat)]} onChange={this.detailDatePickerChange} /> : <RangePicker onChange={this.detailDatePickerChange} />}
